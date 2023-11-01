@@ -1,0 +1,64 @@
+body {
+    margin: 0;
+    font-family: sans-serif;
+    height: 100%;
+}
+
+.main {
+    display: flex;
+}
+
+.sidebar {
+    margin: 8px;
+    display: grid;
+    align-content: baseline;
+}
+
+hr {
+    border: 1px black solid;
+    margin-left: 0px;
+    margin-right: 0px;
+    margin-top: 4px;
+    margin-bottom: 0px;
+}
+
+.selector {
+    border: 2px black solid;
+}
+
+.grid-entry {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+input[type="number"] {
+    width: 60px
+}
+
+.complex-text {
+    user-select: none;
+    font-family: monospace;
+}
+
+details {
+    border-spacing: 0;
+    border: 1px black solid;
+    width: 17em;
+}
+
+summary {
+    background-color: darkslategrey;
+    color: white;
+    font-size: 10pt;
+    padding-left: 5px;
+    user-select: none;
+    border-bottom: 1px black solid;
+}
+
+#path_canvas {
+    position: absolute;
+    left: 0;
+    top: 0;
+    z-index: 10;
+}

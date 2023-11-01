@@ -1,0 +1,826 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <title>Fractal Viewer</title>
+    <link href="style.css" rel="stylesheet">
+    <script src="lib/webgl-utils.js"></script>
+    <script src="lib/webgl-debug.js"></script>
+    <script src="lib/cuon-utils.js"></script>
+    <script src="util.js"></script>
+    <script src="escape-time.js"></script>
+    <script src="lyapunov.js"></script>
+    <script src="root-finding.js"></script>
+    <script src="pendulum.js"></script>
+    <script src="recursive.js"></script>
+    <script src="main.js"></script>
+  </head>
+  <body onload="main()">
+    <div class="main">
+      <canvas id="fractal_canvas" width=1000px height=1000px style="max-height: 1000px"></canvas>
+      <canvas id="path_canvas" width=1000px height=1000px></canvas>
+      <div class="sidebar">
+        <details open=true>
+          <summary>
+            Program
+          </summary>
+          <select id="program">
+            <option value="escape-time">Escape Time</option>
+            <option value="lyapunov">Lyapunov</option>
+            <option value="root-finding">Root Finding</option>
+            <option value="recursive">Recursive</option>
+            <option value="pendulum">Pendulum</option>
+          </select>
+        </details>
+        <div id="escape_time_options">
+          <details open=true>
+            <summary>
+              Fractal options
+            </summary>
+            Fractal:
+            <select id="esc_fractal">
+              <optgroup label="Mandelbrot family">
+                <option value=0>Mandelbrot</option>
+                <option value=1>Burning Ship</option>
+                <option value=2>Tricorn/Mandelbar</option>
+                <option value=44>Perpendicular Mandelbrot</option>
+                <option value=45>Celtic Mandelbrot</option>
+                <option value=46>Celtic Mandelbar</option>
+                <option value=47>Perpendicular Celtic</option>
+                <option value=48>Heart Mandelbrot</option>
+                <option value=39>Perpendicular Burning Ship</option>
+                <option value=49>Buffalo</option>
+                <option value=50>Celtic Heart</option>
+                <option value=51>Perpendicular Buffalo</option>
+                <option value=5>Multibrot</option>
+                <option value=40>Multi-Burning Ship</option>
+                <option value=52>Multi-Mandelbar</option>
+                <option value=23>Complex Multibrot</option>
+                <option value=53>Complex Multi-Burning Ship</option>
+                <option value=54>Complex Multi-Mandelbar</option>
+              </optgroup>
+              <optgroup label="Uncommon Mandelbrot family">
+                <option value=58>Airship</option>
+                <option value=59>Tail</option>
+                <option value=60>Quill</option>
+                <option value=61>Shark Fin</option>
+                <option value=62>Power Drill</option>
+                <option value=63>Big and Little</option>
+                <option value=64>Halo</option>
+                <option value=65>Genie Lamp</option>
+                <option value=66>Hook</option>
+                <option value=67>Cow</option>
+                <option value=68>Sideways Ship</option>
+                <option value=69>Sock Puppet</option>
+                <option value=70>Speedy Buffalo</option>
+                <option value=71>Australia</option>
+                <option value=72>Smart Buffalo</option>
+              </optgroup>
+              <optgroup label="Mandelbrot variants">
+                <option value=26>Other Buffalo</option>
+                <option value=17>Simonbrot</option>
+                <option value=15>Rational Map</option>
+                <option value=16>Phoenix</option>
+                <option value=18>Tippetts</option>
+                <option value=25>Meta-Mandelbrot</option>
+                <option value=32>Zubieta</option>
+                <option value=33>Cubic</option>
+                <option value=36>Twin Mandelbrot</option>
+                <option value=41>Mandelbrot Foam</option>
+                <option value=55>Fraktal 1</option>
+                <option value=56>Fraktal 2</option>
+              </optgroup>
+              <optgroup label="Other Fractals">
+                <option value=3>Heart</option>
+                <option value=4>Mandelbox</option>
+                <option value=6>CodeParade's Feather</option>
+                <option value=22>CodeParade's SFX</option>
+                <option value=14>Sine</option>
+                <option value=19>Marek Dragon</option>
+                <option value=20>Gangopadhyay</option>
+                <option value=21>Exponent</option>
+                <option value=24>Thorn</option>
+                <option value=27>Magnet</option>
+                <option value=28>Triple Dragon</option>
+                <option value=29>Spiral</option>
+                <option value=31>Hyperbolic Sine</option>
+                <option value=42>Collatz 1</option>
+                <option value=43>Collatz 2</option>
+                <option value=57>Cactus</option>
+              </optgroup>
+              <optgroup label="Chaotic Maps">
+                <option value=7>Chirikov</option>
+                <option value=11>Modified Duffing</option>
+                <option value=12>"Gingerbread"</option>
+                <option value=13>Hénon</option>
+                <option value=34>Logistic</option>
+              </optgroup>
+              <optgroup label="Custom">
+                <option value=8>Smelly Shoe</option>
+                <option value=9>Dog Skull</option>
+                <option value=30>Mandelbruh</option>
+                <option value=35>Tricorn Sine</option>
+                <option value=37>Fracktail</option>
+                <option value=38>Sauron</option>
+                <option value=73>Custom</option>
+              </optgroup>
+            </select>
+            <hr>
+            z = x + yi
+            <div id="esc_function_text" style="font-family: monospace">
+              z ← z<sup>2</sup> + c
+            </div>
+            <div id="scaling_div" style="display: none" esc_param=1>
+              Scale:
+              <input id="scaling" type=number value=2.0 step=0.025>
+            </div>
+            <div id="exponent_div" style="display: none" esc_param=1>
+              p:
+              <input id="exponent" type=number value=2.0 step=0.025>
+            </div>
+            <div id="rational_div" style="display: none">
+              p:
+              <input id="rational_p" type=number value=2.0 step=0.025 min=0 esc_param=1>
+              <br>
+              q:
+              <input id="rational_q" type=number value=-2.0 step=0.025 max=0 esc_param=2>
+              <br>
+              λ:
+              <input id="rational_lambda" type=number value=0.0 step=0.0025 esc_param=3>
+            </div>
+            <div id="phoenix_div" style="display: none">
+              <div id="phoenix_p_text" class="complex-text">
+                p = 0 + 0i
+              </div>
+              <canvas id="phoenix_p_selector" class="selector" width=200px height=200px></canvas>
+            </div>
+            <div id="dragon_div" style="display: none">
+              r:
+              <input id="dragon_r" type=number value=0.041 step=0.001 esc_param=1>
+            </div>
+            <div id="gangopadhyay_div" style="display: none">
+              ax1:
+              <input id="gangopadhyay1" type=checkbox>
+              ax2:
+              <input id="gangopadhyay2" type=checkbox>
+              ax3:
+              <input id="gangopadhyay3" type=checkbox checked=true>
+              ax4:
+              <input id="gangopadhyay4" type=checkbox checked=true>
+              ax5:
+              <input id="gangopadhyay5" type=checkbox>
+            </div>
+            <div id="cmultibrot_div" style="display: none">
+              <div id="cmultibrot_p_text" class="complex-text">
+                p = 2 + 0i
+              </div>
+              <canvas id="cmultibrot_p_selector" class="selector" width=200px height=200px></canvas>
+            </div>
+            <div id="mandelbruh_div" style="display: none">
+              a:
+              <input id="mandelbruh_a" type=number value=2.0 step=0.1 esc_param=1>
+            </div>
+            <div id="hyperbolic_sine_div" style="display: none">
+              p:
+              <input id="hyperbolic_sine_p" type=number value=2.0 step=0.025 esc_param=1>
+            </div>
+            <div id="zubieta_div" style="display: none">
+              <div id="zubieta_a_text" class="complex-text">
+                a = 1 + 0i
+              </div>
+              <canvas id="zubieta_a_selector" class="selector" width=200px height=200px></canvas>
+            </div>
+            <div id="sauron_div" style="display: none">
+              <div id="sauron_a_text" class="complex-text">
+                a = 0 + 0i
+              </div>
+              <canvas id="sauron_a_selector" class="selector" width=200px height=200px></canvas>
+            </div>
+            <div id="foam_div" style="display: none">
+              <div id="foam_q_text" class="complex-text">
+                q = 0 + 0i
+              </div>
+              <canvas id="foam_q_selector" class="selector" width=200px height=200px></canvas>
+            </div>
+          </details>
+          <details id="julia_div">
+            <summary>
+              Julia Set view
+            </summary>
+            Max julification = normal julia set.
+            <br>
+            Julification:
+            <input id="julification" type=range min=0 max=1 value=0 step=0.01>
+            <div id="esc_julia_text" class="complex-text">
+              c = 0 + 0i
+            </div>
+            <canvas id="julia_selector" class="selector" width=200px height=200px></canvas>
+          </details>
+          <details open=true>
+            <summary>
+              Iteration parameters
+            </summary>
+            Escape Algorithm:
+            <select id="escape_algorithm">
+              <option value=0>Magnitude</option>
+              <option value=1>Derivative Bailout</option>
+            </select>
+            <div id="esc_mag_div">
+              Escape Magnitude:
+              <input id="escape_radius" type=number value=2 step=0.1 min=0>
+            </div>
+            <div id="esc_der_div" style="display: none">
+              Derivative Bailout Magnitude:
+              <input id="escape_derivative" type=number value=1000 step=25 min=0>
+            </div>
+            Max Iterations:
+            <input id="esc_max_iterations" type=number value=30 step=5 min=0>
+          </details>
+          <details>
+            <summary>
+              Orbit traps
+            </summary>
+            Enable orbit trap colouring to see.
+            <br>
+            <button id="orbit_trap_add">
+              Add new
+            </button>
+            <div id="orbit_traps" style="display: grid">
+            </div>
+          </details>
+          <details open=true>
+            <summary>
+              Exterior colouring
+            </summary>
+            <div>
+              Style:
+              <select id="exterior_colouring_style">
+                <option value=0>Monotonic</option>
+                <option value=1>Cyclic</option>
+                <option value=2>Radial</option>
+              </select>
+            </div>
+            <div id="monotonic_rendering_div">
+              Function:
+              <select id="monotonic_function">
+                <optgroup label="Escape Time">
+                  <option value=0>Discrete</option>
+                  <option value=1 selected>Smooth</option>
+                  <option value=5>Derivative Smooth</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value=2>Normal Map</option>
+                  <option value=3>Stripe Average</option>
+                  <option value=4>Orbit Trap</option>
+                </optgroup>
+              </select>
+              <hr>
+              Easing Function:
+              <select id="monotonic_easing_function">
+                <optgroup label="Polynomial">
+                  <option value=8>Quintic Root</option>
+                  <option value=6>Quartic Root</option>
+                  <option value=4>Cube Root</option>
+                  <option value=2>Square Root</option>
+                  <option value=0 selected>Linear</option>
+                  <option value=1>Quadratic</option>
+                  <option value=3>Cubic</option>
+                  <option value=5>Quartic</option>
+                  <option value=7>Quintic</option>
+                </optgroup>
+                <optgroup label="Other">
+                  <option value=9>Exponential</option>
+                  <option value=10>Sine</option>
+                </optgroup>
+              </select>
+              <br>
+              Ease Out:
+              <input type=checkbox id="monotonic_ease_out">
+              <div id="light_selector_div" style="display: none">
+                Light Position:
+                <br>
+                <canvas id="light_selector" class="selector" width=200px height=200px></canvas>
+              </div>
+              <div id="stripe_average_div" style="display: none">
+                Stripe Density:
+                <input id="stripe_density" type=number value=3 min=0 step=0.1>
+              </div>
+            </div>
+            <div id="cyclic_rendering_div" style="display: none">
+              Cycle Function:
+              <select id="cyclic_cycle_function">
+                <option value=0>Escape Time</option>
+                <option value=1>Orbit Exponential</option>
+                <option value=2>Orbit Trap</option>
+              </select>
+              <br>
+              Waveform:
+              <select id="cyclic_waveform">
+                <option value=0>Sine</option>
+                <option value=1>Square</option>
+                <option value=2>Triangle</option>
+                <option value=3>Sawtooth</option>
+              </select>
+              <br>
+              Period:
+              <input id="esc_cycle_period" type=number value=1 min=0 step=0.01>
+            </div>
+            <div id="radial_rendering_div" style="display: none">
+              Angle:
+              <select id="radial_angle">
+                <option value=0>Final</option>
+                <option value=1>Initial</option>
+                <option value=2>Average</option>
+              </select>
+              <br>
+              Decomposition:
+              <select id="radial_decomposition">
+                <option value=0>Smooth</option>
+                <option value=1>Binary</option>
+              </select>
+            </div>
+            <hr>
+            Colouring:
+            <select id="esc_exterior_colouring">
+              <option value=0>Interpolate</option>
+              <option value=1>Hue</option>
+            </select>
+            <hr>
+            <div style="display: grid">
+              <div id="monotonic_colour_select">
+                <div class="grid-entry">
+                  Close Colour:
+                  <input id="close_colour" type=color value=#0000FF>
+                </div>
+                <div class="grid-entry">
+                  Far Colour:
+                  <input id="far_colour" type=color value=#000000>
+                </div>
+              </div>
+              <div id="other_colour_select" style="display: none">
+                <div class="grid-entry">
+                  Colour 1:
+                  <input id="exterior_colour1" type=color value=#FF0000>
+                </div>
+                <div class="grid-entry">
+                  Colour 2:
+                  <input id="exterior_colour2" type=color value=#00FF00>
+                </div>
+              </div>
+            </div>
+          </details>
+          <details>
+            <summary>
+              Interior colouring
+            </summary>
+            Style:
+            <select id="interior_colouring">
+              <option value=0>Solid</option>
+              <option value=1>Average Magnitude</option>
+              <option value=2>Min Dist</option>
+              <option value=3>Total Orbit Dist</option>
+              <option value=4>Stripe Average</option>
+              <option value=6>Period Checking</option>
+              <option value=7>CodeParade</option>
+              <option value=5>Orbit Trap</option>
+            </select>
+            <div id="interior_stripe_div" style="display: none">
+              Density:
+              <input id="interior_stripe_density" type=number value=3.0 min=0 step=0.1>
+            </div>
+            <div id="interior_period_div" style="display: none">
+              Max period length:
+              <input id="interior_period_length" type=number value=10 min=0>
+              <br>
+              Threshold:
+              <input id="interior_period_threshold" type=number value=0.00001 min=0 step="0.00001">
+            </div>
+            <hr>
+            <div style="display: grid">
+              <div id="interior_solid_div">
+                <div class="grid-entry">
+                  Colour:
+                  <input id="interior_solid_colour" type=color value=#000000>
+                </div>
+              </div>
+              <div id="interior_dist_div" style="display: none">
+                <div class="grid-entry">
+                  Close Colour:
+                  <input id="interior_close_colour" type=color value=#000000>
+                </div>
+                <div class="grid-entry">
+                  Far Colour:
+                  <input id="interior_far_colour" type=color value=#FF00FF>
+                </div>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div id="lyapunov_options" style="display: none">
+          <details open=true>
+            <summary>
+              Chaotic map options
+            </summary>
+            Map:
+            <select id="lya_fractal_type">
+              <option value=0>Logistic</option>
+              <option value=1>Gaussian</option>
+              <option value=2>Circle</option>
+              <option value=3>Quadratic</option>
+              <option value=4>Square Logistic</option>
+              <option value=5>Squared Sine Logistic</option>
+              <option value=6>Sine</option>
+              <option value=7>Cosine</option>
+              <option value=8>Hyperbolic Cosine</option>
+            </select>
+            <div id="lya_function_text" style="font-family: monospace">
+              x ← rx(1 - x)
+            </div>
+            <div id="lya_gauss_div" style="display: none">
+              α:
+              <input id="lya_gauss_alpha" type=number value=4 min=0 max=10 step=0.1>
+            </div>
+            <div id="lya_circle_div" style="display: none">
+              Ω:
+              <input id="lya_circle_omega" type=number value=0.33 min=0 max=1 step=0.01>
+            </div>
+            <div id="lya_quadratic_div" style="display: none">
+              a: 
+              <input id="lya_quadratic_a" type=number value=1 min=-4 max=4 step=0.1>
+            </div>
+            <div id="lya_squared_sine_div" style="display: none">
+              μ:
+              <input id="lya_squared_sine_mu" type=number value=0.2 min=0 max=1 step=0.01>
+            </div>
+            <div id="lya_trig_div" style="display: none">
+              θ:
+              <input id="lya_trig_theta" type=number value=0.0 min=0 max=3.14 step=0.01>
+            </div>
+            <div id="lya_cosh_div" style="display: none">
+              a:
+              <input id="lya_cosh_a" type=number value=2 min=1 max=5 step=0.01>
+            </div>
+          </details>
+          <details open=true>
+            <summary>
+              Sequence
+            </summary>
+            Sequence (X, Y, and Z only):
+            <input id="lya_sequence" type=text value="XY" maxlength=8 size=8>
+            <br>
+            Z value:
+            <input id="z_value" type=range min=0.5 max=4.5 value=2.5 step=0.005 style="width:95%">
+            <hr>
+            Initial Value:
+            <input id="lya_initial" type=number value=0.5 min=0 max=1 step=0.01>
+          </details>
+          <details open=true>
+            <summary>
+              Iteration parameters
+            </summary>
+            Iterations:
+            <input id="lya_iterations" type=number value=300 min=0 step=50>
+          </details>
+          <details open=true>
+            <summary>
+              Colouring
+            </summary>
+            <div style="display: grid">
+              <div class="grid-entry">
+                Stable:
+                <input id="stable_colour" type=color value=#FFFF00>
+              </div>
+              <div class="grid-entry">
+                Chaotic:
+                <input id="chaotic_colour" type=color value=#0000FF>
+              </div>
+              <div class="grid-entry">
+                Infinity:
+                <input id="infinity_colour" type=color value=#000000>
+              </div>
+            </div>
+          </details>
+        </div>
+        <div id="root_finding_options" style="display: none">
+          <details open=true>
+            <summary>
+              Function options
+            </summary>
+            Function:
+            <select id="rtf_function">
+              <option value=0>Cubic</option>
+              <option value=1>Sine</option>
+              <option value=2>General Exponent</option>
+            </select>
+			      <br>
+            Algorithm:
+            <select id="rtf_algorithm">
+              <option value=0>Newton</option>
+              <option value=1>Halley</option>
+              <option value=2>Schröder</option>
+              <option value=5>Householder-3</option>
+              <option value=4>Secant</option>
+              <option value=3>Steffensen</option>
+            </select>
+            <div id="secant_div" style="display: none">
+              <br>
+              Starting point:
+              <select id="secant_start">
+                <option value=0>z0 = 0</option>
+                <option value=1>z0 = swap(z)</option>
+                <option value=2>z0 = 2z</option>
+                <option value=3>z0 = conj(z)</option>
+                <option value=4>z0 = z²</option>
+              </select>
+            </div>
+            <hr>
+            Fractal Type:
+            <select id="rtf_fractal_type">
+              <option value=0>Classic</option>
+              <option value=1>Nova</option>
+              <option value=2>Nova Julia</option>
+              <option value=3>Meta Convergence</option>
+            </select>
+          </details>
+          <details open=true>
+            <summary>
+              Fun movables
+            </summary>
+            <div id="root_selector_div">
+              Roots:
+              <br>
+              <canvas id="root_selector" class=selector width=200px height=200px></canvas>
+              <hr>
+            </div>
+            <div id="rtf_exponent_div" style="display:none">
+              <div id="rtf_exponent_text" class="complex-text">
+                p: 3 + 0i
+              </div>
+              <canvas id="rtf_exponent_selector" class=selector width=200px height=200px></canvas>
+              <hr>
+            </div>
+            <div>
+              <div id="a_text" class="complex-text">
+                a = 1 + 0i
+              </div>
+              <canvas id="a_selector" class="selector" width=200px height=200px></canvas>
+              <hr>
+            </div>
+            <div id="rtf_julia_div" style="display: none">
+              <div id="rtf_julia_text" class="complex-text">
+                c = 0 + 0i
+              </div>
+              <canvas id="rtf_julia_c_selector" class="selector" width=200px height=200px></canvas>
+            </div>
+          </details>
+          <details open=true>
+            <summary>
+              Iteration options
+            </summary>
+            Max Iterations:
+            <input id="rtf_iterations" type=number value=40 min=0>
+            <br>
+            Bailout Threshold:
+            <input id="rtf_threshold" type=number value=0.01 min=0 step=0.01 style="width: 70px">
+          </details>
+          <details open=true>
+            <summary>
+              Colouring style
+            </summary>
+            Style:
+            <select id="rtf_colouring_type">
+              <option value=0 id="rtf_root_colouring">Root</option>
+              <option value=1 id="rtf_shaded_root_colouring" >Shaded Root</option>
+              <option value=5 id="rtf_auto_root_colouring">Auto Root</option>
+              <option value=2 id="rtf_convergence_colouring">Convergence</option>
+              <option value=3 id="rtf_max_orbit_dist_colouring">Max Orbit Distance</option>
+              <option value=4 id="rtf_closest_root_dist_colouring">Closest Root Distance</option>
+            </select>
+            <div id="rtf_dist_options" style="display: none">
+              Modulo:
+              <input id="rtf_dist_mod" type=number value=2 min=0.1 max=10 step=0.1>
+            </div>
+            <div id="rtf_root_dist_options" style="display: none">
+              Brightness:
+              <input id="rtf_root_dist_brightness" type=number value=2 min=0.1 max=10 step=0.1>
+            </div>
+          </details>
+          <details open=true>
+            <summary>
+              Colouring
+            </summary>
+            <div id="root1_colour_div" class="grid-entry">
+              Root 1 Colour:
+              <input id="root1_colour" type=color value=#FF0000>
+            </div>
+            <div id="root2_colour_div" class="grid-entry">
+              Root 2 Colour:
+              <input id="root2_colour" type=color value=#00FF00>
+            </div>
+            <div id="root3_colour_div" class="grid-entry">
+              Root 3 Colour:
+              <input id="root3_colour" type=color value=#0000FF>
+            </div>
+            <div id="convergent_colour_div" class="grid-entry" style="display: none">
+              Convergent Colour:
+              <input id="convergent_colour" type=color value=#FFFFFF>
+            </div>
+            <div class="grid-entry">
+              Unconvergent Colour:
+              <input id="base_colour" type=color value=#000000>
+            </div>
+          </details>
+        </div>
+        <div id="pendulum_options" style="display: none">
+          <details open=true>
+            <summary>
+              Iteration parameters
+            </summary>
+            Iterations:
+            <input id="pend_iterations" type=number value=400 min=0 step=10>
+            <br>
+            Friction:
+            <input id="pend_friction" type=number value=0.01 min=0 step=0.001>
+            <br>
+            Tension:
+            <input id="pend_tension" type=number value=0.75 min=0 step=0.01>
+            <br>
+            Pendulum Mass:
+            <input id="pend_mass" type=number value=1.0 min=0 step=0.01>
+            <br>
+            dt:
+            <input id="pend_dt" type=number value=0.02 min=0 step=0.001>
+          </details>
+          <details id="magnets" style="display: grid" open=true>
+            <summary>
+              Magnets
+            </summary>
+            <canvas id="magnet_selector" class=selector width=200px height=200px></canvas>
+            <button onclick="PENDULUM.addMagnet(true)">
+              Add
+            </button>
+            <button onclick="PENDULUM.deleteMagnet()">
+              Delete
+            </button>
+          </details>
+          <details open=true>
+            <summary>
+              Colouring Options
+            </summary>
+            Colouring Style:
+            <select id="pend_colouring_style">
+              <option value=0>Closest Magnet</option>
+              <option value=1>Shaded Closest</option>
+            </select>
+            Base Colour:
+            <input id="pend_base_colour" type=color value=#000000>
+          </details>
+        </div>
+        <div id="recursive_options" style="display: none">
+          <details open=true>
+            <summary>
+              Fractal options
+            </summary>
+            Fractal Type:
+            <select id="rc_fractal_type">
+              <option value=0>Sierpiński Carpet</option>
+              <option value=1>Sierpiński Triangle</option>
+              <option value=2>T-square</option>
+              <option value=3>Pythagoras Tree</option>
+              <option value=4>H Tree</option>
+              <option value=5>Vicsek</option>
+            </select>
+          </details>
+          <details open=true>
+            <summary>
+              Iteration options
+            </summary>
+            Iterations:
+            <input id="rc_iterations" type=number value=8 min=0 max=20>
+          </details>
+        </div>
+      </div>
+      <div class="sidebar">
+        <details>
+          <summary>
+            Transformations
+          </summary>
+          Transformation:
+          <select id="transformation">
+            <option value=0>None</option>
+            <option value=1>Invert</option>
+            <option value=2>Möbius</option>
+            <option value=3>Exponent</option>
+            <option value=4>Polar</option>
+          </select>
+          <div id="invert_div" style="display: none">
+            <div id="invert_text" class="complex-text">
+              0 + 0i
+            </div>
+            <canvas id="invert_selector" class="selector" width=200px height=200px></canvas>
+          </div>
+          <div id="moebius_div" style="display: none">
+            <div id="moebius_a_text" class="complex-text">
+              a = 0 + 0i
+            </div>
+            <canvas id="moebius_a_selector" class="selector" width=200px height=200px></canvas>
+            <div id="moebius_b_text" class="complex-text">
+              b = 0 + 0i
+            </div>
+            <canvas id="moebius_b_selector" class="selector" width=200px height=200px></canvas>
+            <div id="moebius_c_text" class="complex-text">
+              c = 0 + 0i
+            </div>
+            <canvas id="moebius_c_selector" class="selector" width=200px height=200px></canvas>
+            <div id="moebius_d_text" class="complex-text">
+              d = 0 + 0i
+            </div>
+            <canvas id="moebius_d_selector" class="selector" width=200px height=200px></canvas>
+          </div>
+          <div id="trans_exponent_div" style="display: none">
+            <div id="trans_exponent_a_text" class="complex-text">
+              a = 1 + 0i
+            </div>
+            <canvas id="trans_exponent_a_selector" class="selector" width=200px height=200px></canvas>
+            <div id="trans_exponent_b_text" class="complex-text">
+              b = 0 + 0i
+            </div>
+            <canvas id="trans_exponent_b_selector" class="selector" width=200px height=200px></canvas>
+          </div>
+        </details>
+        <details>
+          <summary>
+            Animations
+          </summary>
+          Frame delay:
+          <input id="animation_frame_delay" type=number value=50 min=5 step=1 style="width: 40px">ms
+          <br>
+          Duration:
+          <input id="animation_duration" type=number value=5 min=0.5 step=0.5>s
+          <br>
+          Speed:
+          <input id="animation_speed" type=number value=1 min=0.1 step=0.1 style="width: 40px">x
+          <hr>
+          <select id="esc_animations">
+            <optgroup label="Julia">
+              <option value=0>Circular walk</option>
+              <option value=1>Spiral walk</option>
+            </optgroup>
+          </select>
+          <div>
+            Radius:
+            <input type=number value=1 min=0 step=0.1 anim_param=1>
+          </div>
+          <button onclick="playAnimation()">
+            Play
+          </button>
+        </details>
+        <details open=true>
+          <summary>
+            Global view options
+          </summary>
+          Samples/pixel:
+          <input id="samples" type=number value=1 min=1>
+          <br>
+          Multisampling:
+          <select id="multisampling_algorithm" value=1>
+            <option value=0>RGB Mean</option>
+            <option value=1 selected>RGB Square Mean</option>
+            <option value=4>HSV Mean</option>
+            <option value=2>XYZ Mean</option>
+            <option value=3>LAB Mean</option>
+          </select>
+          <hr>
+          Canvas Size:
+          <select id="canvas_size" value=1000>
+            <option value=600>600x600</option>
+            <option value=800>800x800</option>
+            <option value=1000 selected>1000x1000</option>
+            <option value=1200>1200x1200</option>
+            <option value=1400>1400x1400</option>
+            <option value=1600>1600x1600</option>
+          </select>
+          <hr>
+          <div id="display_text" style="font-family: monospace">
+            z = 0 + 0i
+            <br>
+            zoom = 0.5
+          </div>
+          <button onclick="resetView()">
+            Reset View
+          </button>
+        </details>
+        <details open=true>
+          <summary>
+            Notes
+          </summary>
+          WASD = Move <br>
+          +/- = Zoom
+          <hr>
+          Don't expect every feature to <br>
+          play well with every other feature!<br>
+          <a href="sources.html">Sources</a>
+        </div>
+      </div>
+    </div>
+  </body>
+</html>
