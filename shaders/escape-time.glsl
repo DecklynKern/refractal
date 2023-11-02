@@ -247,14 +247,14 @@ vec3 getColour(float real, float imag) {
             Complex exp_diff;
             float exponential = 0.0;
         #endif
-		
-	#elif EXTERIOR_COLOURING_STYLE == 2
-		#if RADIAL_ANGLE == 1
-			float init_angle = argument(z);
-			
-		#elif RADIAL_ANGLE == 2
-			Complex total_orbit = z;
-		#endif
+        
+    #elif EXTERIOR_COLOURING_STYLE == 2
+        #if RADIAL_ANGLE == 1
+            float init_angle = argument(z);
+            
+        #elif RADIAL_ANGLE == 2
+            Complex total_orbit = z;
+        #endif
     #endif
 
     #if EXTERIOR_COLOURING_STYLE == 0 && MONOTONIC_FUNCTION == 3
@@ -272,8 +272,8 @@ vec3 getColour(float real, float imag) {
     #elif INTERIOR_COLOURING == 3
         Complex diff;
         float total_dist_sq = 0.0;
-		
-	#elif INTERIOR_COLOURING == 4
+        
+    #elif INTERIOR_COLOURING == 4
         float interior_stripe_total = 0.0;
 
     #elif INTERIOR_COLOURING == 6
@@ -555,13 +555,13 @@ vec3 getColour(float real, float imag) {
                 sine_z.real, -sine_z.imag,
                 sine_z.imag, sine_z.real    
             );
-			
-		#elif FRACTAL == HYPERBOLIC_SINE
-			z = abs(exponent(
-				Complex(
-					sinh(z.real) * cos(z.imag),
-					cosh(z.real) * sin(z.imag)),
-				fractal_param1)) + c;
+            
+        #elif FRACTAL == HYPERBOLIC_SINE
+            z = abs(exponent(
+                Complex(
+                    sinh(z.real) * cos(z.imag),
+                    cosh(z.real) * sin(z.imag)),
+                fractal_param1)) + c;
 
         #elif FRACTAL == RATIONAL_MAP
             z = exponent(z, fractal_param1) - exponent(z, fractal_param2) * fractal_param3 + c;
@@ -674,16 +674,16 @@ vec3 getColour(float real, float imag) {
                 sin(dz2c.real),
                 sinh(dz2c.imag)
             ) * denom;
-		
-		#elif FRACTAL == MANDELBRUH
+        
+        #elif FRACTAL == MANDELBRUH
             z = Complex(
                 z_comp_sq.real - z_comp_sq.imag,
                 fractal_param1 * z.real * z.imag
             ) + c;
-				
-		#elif FRACTAL == ZUBIETA
-		
-			Complex recip = div(
+                
+        #elif FRACTAL == ZUBIETA
+        
+            Complex recip = div(
                 prod(
                     c,
                     Complex(fractal_param1, fractal_param2)),
@@ -693,9 +693,9 @@ vec3 getColour(float real, float imag) {
                 z_comp_sq.real - z_comp_sq.imag,
                 2.0 * z.real * z.imag
             ) + recip;
-			
-		#elif FRACTAL == CUBIC
-			z = exponent(z, 3.0) - exponent(-z, 2.00001) + c;
+            
+        #elif FRACTAL == CUBIC
+            z = exponent(z, 3.0) - exponent(-z, 2.00001) + c;
 
         #elif FRACTAL == DUFFING
             z = Complex(
@@ -831,11 +831,11 @@ vec3 getColour(float real, float imag) {
                 exp_diff = z - z_prev;
                 exponential += exp(-(sqrt(mag_sq) + 0.5 * inversesqrt(dot(exp_diff, exp_diff))));
             #endif
-			
-		#elif EXTERIOR_COLOURING_STYLE == 2
-			#if RADIAL_ANGLE == 2
-				total_orbit += z;
-			#endif
+            
+        #elif EXTERIOR_COLOURING_STYLE == 2
+            #if RADIAL_ANGLE == 2
+                total_orbit += z;
+            #endif
         #endif
 
         #if INTERIOR_COLOURING == 1
@@ -847,7 +847,7 @@ vec3 getColour(float real, float imag) {
         #elif INTERIOR_COLOURING == 3
             diff = z - z_prev;
             total_dist_sq += dot(diff, diff);
-		
+        
         #elif INTERIOR_COLOURING == 4
             interior_stripe_total += 0.5 + 0.5 * sin(interior_colouring_param1 * argument(z));
         
@@ -1041,15 +1041,15 @@ vec3 getColour(float real, float imag) {
             
             float angle;
 
-			#if RADIAL_ANGLE == 0
-				angle = argument(z);
-				
-			#elif RADIAL_ANGLE == 1
-				angle = init_angle;
-				
-			#elif RADIAL_ANGLE == 2
-				angle = argument(total_orbit);
-			#endif
+            #if RADIAL_ANGLE == 0
+                angle = argument(z);
+                
+            #elif RADIAL_ANGLE == 1
+                angle = init_angle;
+                
+            #elif RADIAL_ANGLE == 2
+                angle = argument(total_orbit);
+            #endif
 
             #if RADIAL_DECOMPOSITION == 0
                 colour_val = abs(angle) / PI;

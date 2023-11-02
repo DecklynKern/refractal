@@ -323,16 +323,16 @@ vec3 getColour(float real, float imag) {
         return
             mat3(root1_colour, root2_colour, root3_colour) *
             (1.0 - min(vec3(1.0, 1.0, 1.0), log(min_root_dists_sq / colouring_param + 1.0)));
-			
-	#elif COLOURING_TYPE == 5
+            
+    #elif COLOURING_TYPE == 5
 
         if (iters == MAX_ITERATIONS) {
             return base_colour;
         }
-	
+    
         // fix 
-		float thresh = 2.0 * (threshold + 0.000000000000001);
-		return vec3((thresh * round(z.xy / thresh)), 1.0);
+        float thresh = 2.0 * (threshold + 0.000000000000001);
+        return vec3((thresh * round(z.xy / thresh)), 1.0);
 
     #else
 
