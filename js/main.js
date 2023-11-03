@@ -1,12 +1,3 @@
-const VERTEX_SHADER = `#version 300 es
-in vec2 position;
-out vec2 frag_position;
-
-void main() {
-    gl_Position = vec4(position.x, -position.y, 0, 1);
-    frag_position = position;
-}`;
-
 var FRAGMENT_MAIN = "";
 var FRAGMENT_SHADER = "";
 var gl;
@@ -53,11 +44,18 @@ var animation_param1 = 1;
 
 function main() {
 
+    const vertex_request = new XMLHttpRequest();
+    vertex_request.addEventListener("load", function() {
+        VERTEX_SHADER = this.responseText;
+    });
+    vertex_request.open("GET", "shaders/vertex.glsl");
+    vertex_request.send();
+
     const main_request = new XMLHttpRequest();
     main_request.addEventListener("load", function() {
         FRAGMENT_MAIN = this.responseText;
     });
-    main_request.open("GET", "shaders/main.glsl");
+    main_request.open("GET", "shaders/frag_main.glsl");
     main_request.send();
 
     document.getElementById("program").onchange = updateProgram;

@@ -51,7 +51,7 @@ class Lyapunov extends Program {
 
         var sequence_iter = "";
 
-        for (val of this.sequence) {
+        for (let val of this.sequence) {
 
             if (val == 0) {
                 sequence_iter += "r = a;\n";

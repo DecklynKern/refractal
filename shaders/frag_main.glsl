@@ -97,7 +97,7 @@ Complex exponent(Complex z, Complex d) {
 
     float z_norm_sq = dot(z, z);
     float arg = argument(z);
-    float r = pow(z_norm_sq, 0.5 * d.real) * exp(-d.imag * arg);    
+    float r = pow(z_norm_sq, 0.5 * d.real) * exp(-d.imag * arg);
     float angle = dot(d, Complex(arg, 0.5 * log(z_norm_sq)));
 
     return r * Complex(
