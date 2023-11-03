@@ -16,7 +16,7 @@ var mouse_down = false;
 var magnitude = new ParamFloat(2, "magnitude");
 var centre_x = new ParamFloat(0, "centre_x");
 var centre_y = new ParamFloat(0, "centre_y");
-var canvas_size = new ParamFloat(1000, "canvas_size");
+var canvas_size = new ParamInt(1000, "canvas_size");
 
 var transformation = 0;
 var invert_handler;

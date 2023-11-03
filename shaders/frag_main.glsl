@@ -10,6 +10,7 @@ precision highp float;
 uniform float magnitude;
 uniform float centre_x;
 uniform float centre_y;
+uniform int canvas_size;
 
 uniform float transform_param1;
 uniform float transform_param2;
@@ -33,8 +34,8 @@ const Complex ZERO = Complex(0.0, 0.0);
 const Complex ONE = Complex(1.0, 0.0);
 const Complex TWO = Complex(2.0, 0.0);
 const Complex THREE = Complex(3.0, 0.0);
-const Complex SQRT_2 = Complex(1.41421356, 0.0);
 const Complex I = Complex(0.0, 1.0);
+const Complex SQRT_2 = Complex(1.41421356, 0.0);
 
 Complex reciprocal(Complex z) {
     return Complex(z.real, -z.imag) * (1.0 / dot(z, z));

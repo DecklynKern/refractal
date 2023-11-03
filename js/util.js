@@ -201,8 +201,15 @@ class ComplexPickerHandler {
     }
     
     loadValues() {
-        this.real_param.value = this.real;
-        this.imag_param.value = this.imag;
+
+        if (this.params.length == 1) {
+            this.params[0].real = this.real;
+            this.params[0].imag = this.imag;
+        }
+        else {
+            this.params[0].value = this.real;
+            this.params[1].value = this.imag;
+        }
     }
 
     updateComplex(event) {

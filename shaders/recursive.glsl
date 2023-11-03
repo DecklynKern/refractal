@@ -1,5 +1,3 @@
-uniform int canvas_size;
-
 uniform int fractal_type;
 uniform int iterations;
 
@@ -48,7 +46,7 @@ for (int iteration = 0; iteration < TRUE_ITER_CAP; iteration++) {\
 return remain_colour;
 
 #define ITERATE_CHECK_FINAL(escape_check, update_func, escape_colour, remain_colour)\
-for (int iteration = 0; iteration < TRUE_ITER_CAP; iteration ++) {\
+for (int iteration = 0; iteration < TRUE_ITER_CAP; iteration++) {\
     \
     if (iteration == iterations) {\
         break;\
@@ -91,7 +89,7 @@ bool pTreeEscape(Iterator iter) {
     return rectBound(iter.pos, 0.4375, 0.5625, 0.0, 0.125);
 }
 
-const float TREE_SCALING = 2.0 / SQRT_2;
+const float TREE_SCALING = 2.0 / SQRT_2.real;
 
 void pTreeUpdate(inout Iterator iter) {
 
@@ -141,7 +139,6 @@ vec3 getColourIter(Iterator iter) {
 
     if (fractal_type == 0) {
         ITERATE(carpetEscape, carpetUpdate, WHITE, BLACK);
-    
     }
     else if (fractal_type == 1) {
         
@@ -156,7 +153,6 @@ vec3 getColourIter(Iterator iter) {
     }
     else if (fractal_type == 2) {
         ITERATE(tSquareEscape, tSquareUpdate, BLACK, WHITE);
-
     }
     else if (fractal_type == 3) {
 
@@ -171,11 +167,9 @@ vec3 getColourIter(Iterator iter) {
     }
     else if (fractal_type == 4) {
         ITERATE(hTreeEscape, hTreeUpdate, BLACK, WHITE);
-    
     }
     else if (fractal_type == 5) {
         ITERATE(vicsekEscape, vicsekUpdate, BLACK, WHITE);
-
     }
 
     return WHITE;
