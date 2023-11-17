@@ -1,6 +1,8 @@
 # refractal
 WebGL fractal renderer
 
+Available at: https://decklynkern.github.io/refractal
+
 This is a long-term project of mine to create the best fractal renderer available online.
 It is intended to be:
 - Fast
