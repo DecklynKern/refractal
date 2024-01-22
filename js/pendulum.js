@@ -3,7 +3,7 @@ class Pendulum extends Program {
     shader = "shaders/pendulum.glsl";
     options_panel = "pendulum_options";
 
-    iterations = 400;
+    iterations = 200;
 
     friction = new ParamFloat(0.01, "friction");
     tension = new ParamFloat(0.75, "tension");

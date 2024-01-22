@@ -1,7 +1,7 @@
 <!DOCTYPE html>
 <html lang="en">
   <head>
-    <title>Fractal Viewer</title>
+    <title>Refractal</title>
     <link href="style.css" rel="stylesheet">
     <script src="lib/webgl-utils.js"></script>
     <script src="lib/webgl-debug.js"></script>
@@ -335,38 +335,17 @@
               Decomposition:
               <select id="radial_decomposition">
                 <option value=0>Smooth</option>
-                <option value=1>Binary</option>
+                <option value=1>Discrete</option>
               </select>
             </div>
             <hr>
             Colouring:
             <select id="esc_exterior_colouring">
-              <option value=0>Interpolate</option>
+              <option value=0>Gradient</option>
               <option value=1>Hue</option>
             </select>
             <hr>
-            <div style="display: grid">
-              <div id="monotonic_colour_select">
-                <div class="grid-entry">
-                  Close Colour:
-                  <input id="close_colour" type=color value=#0000FF>
-                </div>
-                <div class="grid-entry">
-                  Far Colour:
-                  <input id="far_colour" type=color value=#000000>
-                </div>
-              </div>
-              <div id="other_colour_select" style="display: none">
-                <div class="grid-entry">
-                  Colour 1:
-                  <input id="exterior_colour1" type=color value=#FF0000>
-                </div>
-                <div class="grid-entry">
-                  Colour 2:
-                  <input id="exterior_colour2" type=color value=#00FF00>
-                </div>
-              </div>
-            </div>
+            <canvas id="exterior_gradient" class="gradient" data-init_min_colour="#000000" data-init_max_colour="#0000FF"></canvas>
           </details>
           <details>
             <summary>
@@ -425,12 +404,13 @@
               <option value=0>Logistic</option>
               <option value=1>Gaussian</option>
               <option value=2>Circle</option>
-              <option value=3>Quadratic</option>
-              <option value=4>Square Logistic</option>
+              <option value=3>Polynomial</option>
+              <option value=4>Exponent Logistic</option>
               <option value=5>Squared Sine Logistic</option>
               <option value=6>Sine</option>
               <option value=7>Cosine</option>
               <option value=8>Hyperbolic Cosine</option>
+              <option value=9>Exponential</option>
             </select>
             <div id="lya_function_text" style="font-family: monospace">
               x ← rx(1 - x)
@@ -446,6 +426,10 @@
             <div id="lya_quadratic_div" style="display: none">
               a: 
               <input id="lya_quadratic_a" type=number value=1 min=-4 max=4 step=0.1>
+            </div>
+            <div id="lya_exponent_div" style="display: none">
+              p:
+              <input id="lya_exponent" type=number value=2 step=0.1>
             </div>
             <div id="lya_squared_sine_div" style="display: none">
               μ:
@@ -471,7 +455,7 @@
             <input id="z_value" type=range min=0.5 max=4.5 value=2.5 step=0.005 style="width:95%">
             <hr>
             Initial Value:
-            <input id="lya_initial" type=number value=0.5 min=0 max=1 step=0.01>
+            <input id="lya_initial" type=number value=0.5 step=0.1>
           </details>
           <details open=true>
             <summary>
@@ -636,7 +620,7 @@
               Iteration parameters
             </summary>
             Iterations:
-            <input id="pend_iterations" type=number value=400 min=0 step=10>
+            <input id="pend_iterations" type=number value=200 min=0 step=10>
             <br>
             Friction:
             <input id="pend_friction" type=number value=0.01 min=0 step=0.001>
@@ -781,13 +765,13 @@
           Samples/pixel:
           <input id="samples" type=number value=1 min=1>
           <br>
-          Multisampling:
-          <select id="multisampling_algorithm" value=1>
-            <option value=0>RGB Mean</option>
-            <option value=1 selected>RGB Square Mean</option>
-            <option value=4>HSV Mean</option>
-            <option value=2>XYZ Mean</option>
-            <option value=3>LAB Mean</option>
+          Blending:
+          <select id="blending_algorithm" value=1>
+            <option value=0>RGB</option>
+            <option value=1>RGB Square</option>
+            <option value=4>HSV</option>
+            <option value=2>XYZ</option>
+            <option value=3>LAB</option>
           </select>
           <hr>
           Canvas Size:
@@ -822,5 +806,6 @@
         </div>
       </div>
     </div>
+    <input id="colour-picker" type=color tabindex=-1 style="display: none">
   </body>
 </html>

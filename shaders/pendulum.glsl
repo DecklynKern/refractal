@@ -81,7 +81,7 @@ vec3 getColour(float x, float y) {
         }
     
     #elif COLOURING_STYLE == 1
-        return mix(magnet_colours[closest_idx], base_colour, float(iters_taken) / float(ITERATIONS));
+        return mixColour(magnet_colours[closest_idx], base_colour, float(iters_taken) / float(ITERATIONS));
     #endif
     
 }

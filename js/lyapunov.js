@@ -3,12 +3,25 @@ LYAPUNOV_FUNCTIONS = [
     "x ← e<sup>-αx²</sup> + r",
     "x ← x + Ω + r/2π*sin(2πx)",
     "x ← r - ax<sup>2</sup>",
-    "x ← rx(1 - x<sup>2</sup>)",
+    "x ← rx(1 - x<sup>p</sup>)",
     "x ← rx(1 - x) + μsin<sup>2</sup>(2πx)",
     "x ← r*sin(x)",
     "x ← r*cos(x)",
-    "x ← r*(a - cosh(x))",
-    "x ← r/2(xcos<sup>2</sup>(π/2x) + (3x + 1)sin<sup>2</sup>(π/2x))"
+    "x ← r(a - cosh(x))",
+    "x ← rxe<sup>x</sup>"
+]
+
+LYAPUNOV_INITIAL_VALUES = [
+    0.5,
+    0,
+    0,
+    0,
+    0.6,
+    0,
+    3.15,
+    0,
+    0,
+    -1
 ]
 
 class Lyapunov extends Program {
@@ -77,6 +90,7 @@ class Lyapunov extends Program {
         document.getElementById("lya_gauss_alpha").onchange = this.updateGaussAlpha;
         document.getElementById("lya_circle_omega").onchange = paramSet(this.fractal_param);
         document.getElementById("lya_quadratic_a").onchange = paramSet(this.fractal_param);
+        document.getElementById("lya_exponent").onchange = paramSet(this.fractal_param);
         document.getElementById("lya_squared_sine_mu").onchange = paramSet(this.fractal_param);
         document.getElementById("lya_trig_theta").onchange = paramSet(this.fractal_param);
         document.getElementById("lya_cosh_a").onchange = paramSet(this.fractal_param);
@@ -101,6 +115,7 @@ class Lyapunov extends Program {
         var gauss_style = document.getElementById("lya_gauss_div").style;
         var circle_style = document.getElementById("lya_circle_div").style;
         var quadratic_style = document.getElementById("lya_quadratic_div").style;
+        var exponent_style = document.getElementById("lya_exponent_div").style;
         var squared_sine_style = document.getElementById("lya_squared_sine_div").style;
         var trig_style = document.getElementById("lya_trig_div").style;
         var cosh_style = document.getElementById("lya_cosh_div").style;
@@ -109,11 +124,15 @@ class Lyapunov extends Program {
         gauss_style.display = "none";
         circle_style.display = "none";
         quadratic_style.display = "none";
+        exponent_style.display = "none";
         squared_sine_style.display = "none";
         trig_style.display = "none";
         cosh_style.display = "none";
 
         function_text.innerHTML = LYAPUNOV_FUNCTIONS[LYAPUNOV.fractal_type];
+        document.getElementById("lya_initial").value =
+            LYAPUNOV.initial_value.value =
+            LYAPUNOV_INITIAL_VALUES[LYAPUNOV.fractal_type];
 
         if (LYAPUNOV.fractal_type == 1) {
             LYAPUNOV.fractal_param.value = -document.getElementById("lya_gauss_alpha").value;
@@ -126,6 +145,10 @@ class Lyapunov extends Program {
         else if (LYAPUNOV.fractal_type == 3) {
             LYAPUNOV.fractal_param.value = document.getElementById("lya_quadratic_a").value;
             quadratic_style.display = "block";
+        }
+        else if (LYAPUNOV.fractal_type == 4) {
+            LYAPUNOV.fractal_param.value = document.getElementById("lya_exponent").value;
+            exponent_style.display = "block";
         }
         else if (LYAPUNOV.fractal_type == 5) {
             LYAPUNOV.fractal_param.value = document.getElementById("lya_squared_sine_mu").value;

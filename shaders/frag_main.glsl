@@ -37,6 +37,9 @@ const Complex THREE = Complex(3.0, 0.0);
 const Complex I = Complex(0.0, 1.0);
 const Complex SQRT_2 = Complex(1.41421356, 0.0);
 
+const vec3 BLACK = vec3(0.0, 0.0, 0.0);
+const vec3 WHITE = vec3(1.0, 1.0, 1.0);
+
 Complex reciprocal(Complex z) {
     return Complex(z.real, -z.imag) * (1.0 / dot(z, z));
 }
@@ -193,6 +196,26 @@ vec3 hsv2rgb(vec3 c) {
     return c.z * mix(K.xxx, clamp(p - K.xxx, 0.0, 1.0), c.y);
 }
 
+vec3 mixColour(vec3 colour1, vec3 colour2, float amount) {
+
+    #if BLENDING_ALGORITHM == 0
+        return mix(colour1, colour2, amount);
+
+    #elif BLENDING_ALGORITHM == 1
+        return sqrt(mix(colour1 * colour1, colour2 * colour2, amount));
+
+    #elif BLENDING_ALGORITHM == 2
+        return xyz2rgb(mix(rgb2xyz(colour1), rgb2xyz(colour2), amount));
+
+    #elif BLENDING_ALGORITHM == 3
+        return lab2rgb(mix(rgb2lab(colour1), rgb2lab(colour2), amount));
+
+    #elif BLENDING_ALGORITHM == 4
+        return hsv2rgb(mix(rgb2hsv(colour1), rgb2hsv(colour2), amount));
+    #endif
+
+}
+
 vec3 getColour(float x, float y);
 
 void main() {
@@ -238,16 +261,16 @@ void main() {
 
         vec3 pixel_sample = getColour(pos.x, pos.y);
 
-        #if MULTISAMPLING_ALGORITHM == 1
+        #if BLENDING_ALGORITHM == 1
             pixel_sample *= pixel_sample;
 
-        #elif MULTISAMPLING_ALGORITHM == 2
+        #elif BLENDING_ALGORITHM == 2
             pixel_sample = rgb2xyz(pixel_sample);
 
-        #elif MULTISAMPLING_ALGORITHM == 3
+        #elif BLENDING_ALGORITHM == 3
             pixel_sample = rgb2lab(pixel_sample);
 
-        #elif MULTISAMPLING_ALGORITHM == 4
+        #elif BLENDING_ALGORITHM == 4
             pixel_sample = rgb2hsv(pixel_sample);
         #endif
 
@@ -258,19 +281,19 @@ void main() {
     colour_sum *= 1.0 / float(SAMPLES);
     vec3 final_colour;
 
-    #if MULTISAMPLING_ALGORITHM == 0
+    #if BLENDING_ALGORITHM == 0
         final_colour = colour_sum;
 
-    #elif MULTISAMPLING_ALGORITHM == 1
+    #elif BLENDING_ALGORITHM == 1
         final_colour = sqrt(colour_sum);
 
-    #elif MULTISAMPLING_ALGORITHM == 2
+    #elif BLENDING_ALGORITHM == 2
         final_colour = xyz2rgb(colour_sum);
 
-    #elif MULTISAMPLING_ALGORITHM == 3
+    #elif BLENDING_ALGORITHM == 3
         final_colour = lab2rgb(colour_sum);
 
-    #elif MULTISAMPLING_ALGORITHM == 4
+    #elif BLENDING_ALGORITHM == 4
         final_colour = hsv2rgb(colour_sum);
     #endif
 

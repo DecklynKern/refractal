@@ -120,6 +120,27 @@ class ParamVec3 extends Param {
     }
 }
 
+class ParamFloatList extends Param {
+    load() {
+        gl.uniform1fv(this.attr, new Float32Array(this.value));
+    }
+}
+
+class ParamVec3List extends Param {
+
+    load() {
+
+        var list = [];
+
+        for (let vec3 of this.value) {
+            list = list.concat(vec3);
+        }
+   
+        gl.uniform3fv(this.attr, new Float32Array(list));
+    
+    }
+}
+
 class Program {
     
     baseShader = null;
@@ -137,10 +158,19 @@ class Program {
         }
     }
 
-    loadAttrs() {
-        for (let param of this.params) {
-            param.load();
+    _load(params) {
+        for (let param of params) {
+            if (Array.isArray(param)) {
+                this._load(param);
+            }
+            else {
+                param.load();
+            }
         }
+    }
+
+    loadAttrs() {
+        this._load(this.params);
     }
 }
 
@@ -169,9 +199,9 @@ class ComplexPickerHandler {
         this.template = template;
 
         var canvas_ref = document.getElementById(canvas);
-        
         this.canvas_context = canvas_ref.getContext("2d");
-        var t = this;
+
+        const t = this;
         canvas_ref.onmousemove = function(event) {
             t.updateComplex(event);
         };
@@ -238,4 +268,182 @@ class ComplexPickerHandler {
         redraw();
         
     }
+}
+
+const GRADIENT_WIDTH = 200;
+const GRADIENT_HEIGHT = 100;
+const GRADIENT_PAD = 5;
+const GRADIENT_DRAW_WIDTH = GRADIENT_WIDTH - 2 * GRADIENT_PAD;
+const GRADIENT_CIRCLE_Y = 20;
+const GRADIENT_CIRCLE_RADIUS = 8;
+const GRADIENT_BOX_WIDTH = 6;
+
+class GradientHandler {
+
+    constructor(canvas, init_min_colour, init_max_colour) {
+
+        canvas.width = GRADIENT_WIDTH;
+        canvas.height = GRADIENT_HEIGHT;
+
+        this.selected_colour = 0;
+        this.colours = [[0, init_min_colour], [1, init_max_colour]];
+        this.context = canvas.getContext("2d");
+        this.context.strokeWidth = 2;
+
+        this.onColourNumChange = () => {};
+        this.onColourChange = (_changed_idx) => {};
+
+        const t = this;
+        canvas.onmousedown = function(event) {
+            t.onMouseDown(event);
+        }
+        canvas.ondblclick = function(event) {
+            t.onDoubleClick(event);
+        }
+        canvas.onmousemove = function(event) {
+            t.onMouseMove(event);
+        }
+
+        this.redraw();
+
+    }
+
+    getClickedColour = function(event) {
+
+        for (var idx = 0; idx < this.colours.length; idx++) {
+
+            if (Math.abs(event.offsetX - (GRADIENT_DRAW_WIDTH * this.colours[idx][0] + GRADIENT_PAD)) <= GRADIENT_CIRCLE_RADIUS) {
+                return idx;
+            }
+        }
+
+        return -1;
+
+    }
+
+    onMouseDown = function(event) {
+
+        const clicked_colour = this.getClickedColour(event);
+
+        if (clicked_colour != -1) {
+
+            this.selected_colour = clicked_colour;
+
+            if (event.offsetY > GRADIENT_CIRCLE_Y + GRADIENT_CIRCLE_RADIUS) {
+
+                const colour_picker = document.getElementById("colour-picker");
+
+                const t = this;
+
+                colour_picker.value = this.colours[this.selected_colour][1];
+                colour_picker.focus();
+                colour_picker.click();
+                colour_picker.onchange = function(event) {
+                    t.colours[t.selected_colour][1] = event.target.value;
+                    t.redraw();
+                    t.onColourChange(clicked_colour);
+                }
+            }
+
+            return;
+
+        }
+
+        this.selected_colour = this.colours.length;
+        this.colours.push([(event.offsetX - GRADIENT_PAD) / GRADIENT_DRAW_WIDTH, "#ffff00"]);
+        this.redraw();
+        this.onColourNumChange();
+
+    }
+
+    onDoubleClick = function(event) {
+
+        const clicked_colour = this.getClickedColour(event);
+
+        if (clicked_colour != -1) {
+            this.colours.splice(clicked_colour, 1);
+            this.redraw();
+            this.onColourNumChange(this.colours.length - 1);
+        }
+    }
+
+    onMouseMove = function(event) {
+
+        if (!mouse_down) {
+            return;
+        }
+
+        if (event.offsetX < GRADIENT_PAD || event.offsetX > GRADIENT_WIDTH - GRADIENT_PAD) {
+            return;
+        }
+
+        this.colours[this.selected_colour][0] = (event.offsetX - GRADIENT_PAD) / GRADIENT_DRAW_WIDTH;
+        this.redraw();
+        this.onColourChange(this.selected_colour);
+
+    }
+
+    redraw() {
+
+        this.context.fillStyle = "white";
+        this.context.fillRect(0, 0, GRADIENT_WIDTH, GRADIENT_HEIGHT);
+
+        const gradient = this.context.createLinearGradient(
+            GRADIENT_PAD,
+            GRADIENT_HEIGHT / 2,
+            GRADIENT_WIDTH - GRADIENT_PAD, 
+            GRADIENT_HEIGHT / 2
+        );
+
+        var min_colour = "black";
+        var min_pos = 2.0;
+
+        var max_colour = "black";
+        var max_pos = -1.0;
+
+        for (let colour of this.colours) {
+            if (colour[0] < min_pos) {
+                [min_pos, min_colour] = colour;
+            }
+            if (colour[0] > max_pos) {
+                [max_pos, max_colour] = colour;
+            }
+        }
+
+        gradient.addColorStop(0, min_colour);
+        this.colours.forEach(colour => gradient.addColorStop(...colour));
+        gradient.addColorStop(1, max_colour);
+
+        this.context.fillStyle = gradient;
+        this.context.fillRect(GRADIENT_PAD, 40, GRADIENT_DRAW_WIDTH, 60);
+
+        for (let colour of this.colours) {
+
+            const x = GRADIENT_PAD + GRADIENT_DRAW_WIDTH * colour[0];
+            
+            this.context.fillStyle = colour[1];
+            
+            this.context.beginPath();
+            
+            this.context.arc(x, GRADIENT_CIRCLE_Y, GRADIENT_CIRCLE_RADIUS, 0, 2 * Math.PI);
+            this.context.fill();
+            
+            const left = x - GRADIENT_BOX_WIDTH / 2;
+            const right = x + GRADIENT_BOX_WIDTH / 2;
+            const top = GRADIENT_CIRCLE_Y + GRADIENT_CIRCLE_RADIUS;
+            const bottom = GRADIENT_HEIGHT;
+            
+            this.context.moveTo(left, top);
+            this.context.lineTo(left, bottom);
+            this.context.lineTo(right, bottom);
+            this.context.lineTo(right, top);
+            
+            this.context.stroke();
+         
+        }
+    }
+}
+
+function getGradientHandler(id) {
+    return gradients[document.getElementById(id).gradient_idx];
 }

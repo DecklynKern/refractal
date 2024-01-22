@@ -317,7 +317,7 @@ vec3 getColour(float real, float imag) {
     }
 
     #if COLOURING_TYPE == 2
-        return mix(root1_colour, base_colour, float(iters) / float(MAX_ITERATIONS));
+        return mixColour(root1_colour, base_colour, float(iters) / float(MAX_ITERATIONS));
 
     #elif COLOURING_TYPE == 4
         return
@@ -357,13 +357,13 @@ vec3 getColour(float real, float imag) {
         }
 
         if (root_dist_1 < root_dist_2 && root_dist_1 < root_dist_3) {
-            return mix(root1_colour, base_colour, amount);
+            return mixColour(root1_colour, base_colour, amount);
         }
         else if (root_dist_2 < root_dist_3) {
-            return mix(root2_colour, base_colour, amount);
+            return mixColour(root2_colour, base_colour, amount);
         }
         else {
-            return mix(root3_colour, base_colour, amount);
+            return mixColour(root3_colour, base_colour, amount);
         }
 
     #endif

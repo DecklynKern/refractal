@@ -26,9 +26,9 @@ void doIteration(in float r, inout float x, inout float lambda) {
         x = r - fractal_param * x * x;
         lambda += log(abs(2.0 * fractal_param * x));
 
-    #elif FRACTAL_TYPE == 4 // square logistic
-        x = r * x * (1.0 - x * x);
-        lambda += log(abs(3.0 * x * x - 1.0));
+    #elif FRACTAL_TYPE == 4 // exponent logistic
+        x = r * x * (1.0 - pow(x, fractal_param));
+        lambda += log(abs(r * ((fractal_param + 1.0) * pow(x, fractal_param) - 1.0)));
 
     #elif FRACTAL_TYPE == 5 // squared sine logistic
         float s = sin(TAU * x);
@@ -46,6 +46,11 @@ void doIteration(in float r, inout float x, inout float lambda) {
     #elif FRACTAL_TYPE == 8
         x = r * (fractal_param - cosh(x));
         lambda += log(abs(r * sinh(x)));
+
+    #elif FRACTAL_TYPE == 9
+        x = r * x * exp(x);
+        lambda += log(abs(r * (1.0 + x) * exp(x)));
+
     #endif
 
 }
@@ -63,13 +68,13 @@ vec3 getColour(float a, float b) {
     lambda /= float(ITERATIONS) * 3.0;
 
     if (lambda < 0.0) {
-        return mix(stable_colour, infinity_colour, min(sqrt(-lambda), 1.0));
+        return mixColour(stable_colour, infinity_colour, min(pow(-lambda, 0.25), 1.0));
     }
     else {
-        float amount = sqrt(lambda);
+        float amount = pow(lambda, 0.25);
         return chaotic_colour * (1.0 - amount) + infinity_colour * amount;
 
-        // return mix(chaotic_colour, infinity_colour, sqrt(lambda));
+        // return mixColour(chaotic_colour, infinity_colour, sqrt(lambda));
         // fsr this doesn't work right
     }
 }

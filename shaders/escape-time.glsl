@@ -75,6 +75,7 @@
 
 #if (EXTERIOR_COLOURING_STYLE == 0 && MONOTONIC_FUNCTION == 2) || ESCAPE_ALGORITHM == 1
     #define MONITOR_DERIVATIVE
+    #define MONITOR_PREV
 #endif
 
 #if INTERIOR_COLOURING == 7
@@ -95,8 +96,8 @@ uniform float escape_param;
 uniform float julification;
 uniform Complex julia_c;
 
-uniform vec3 exterior_colour1;
-uniform vec3 exterior_colour2;
+uniform vec3 exterior_colouring_colours[EXTERIOR_COLOURING_COLOUR_COUNT];
+uniform float exterior_colouring_positions[EXTERIOR_COLOURING_COLOUR_COUNT];
 
 uniform float exterior_colouring_param1;
 uniform float exterior_colouring_param2;
@@ -786,7 +787,6 @@ vec3 getColour(float real, float imag) {
                 + prod(c - ONE, z) - c;
 
         #elif FRACTAL == CUSTOM
-            z = z_comp_sq + prod(z, z) + c;
 
         #endif
 
@@ -899,20 +899,20 @@ vec3 getColour(float real, float imag) {
             return interior_colour1;
 
         #elif INTERIOR_COLOURING == 1
-            return mix(interior_colour1, interior_colour2, mag_sum * inversesqrt(float(iterations)));
+            return mixColour(interior_colour1, interior_colour2, mag_sum * inversesqrt(float(iterations)));
 
         #elif INTERIOR_COLOURING == 2
-            return mix(interior_colour2, interior_colour1, min_dist_sq);
+            return mixColour(interior_colour2, interior_colour1, min_dist_sq);
 
         #elif INTERIOR_COLOURING == 3
             return hsv2rgb(vec3(fract(sqrt(total_dist_sq)), 1.0, 1.0));
 
         #elif INTERIOR_COLOURING == 4
-            return mix(interior_colour2, interior_colour1, interior_stripe_total / float(MAX_ITERATIONS));
+            return mixColour(interior_colour2, interior_colour1, interior_stripe_total / float(MAX_ITERATIONS));
 
         #elif INTERIOR_COLOURING == 5
             #ifdef MONITOR_ORBIT_TRAPS
-                return mix(interior_colour2, interior_colour1, orbit_min_dist * 0.5);
+                return mixColour(interior_colour2, interior_colour1, orbit_min_dist * 0.5);
             #else
                 return interior_colour1;
             #endif
@@ -949,12 +949,11 @@ vec3 getColour(float real, float imag) {
                 z = normalize(div(z, der));
                 Complex dir = Complex(exterior_colouring_param1, exterior_colouring_param2);
                 
-                colour_val = max(0.0, dot(z, dir) + sqrt(1.0 - dot(dir, dir)));
+                colour_val = dot(z, dir) + sqrt(1.0 - dot(dir, dir));
 
             #elif MONOTONIC_FUNCTION == 3
                 float interp = getSmoothIter(mag_sq);
                 colour_val = mix(exterior_stripe_total_prev, exterior_stripe_total, interp) / (float(iterations) + interp);
-                colour_val = max(colour_val, 0.0);
 
             #elif MONOTONIC_FUNCTION == 4
                 #ifdef MONITOR_ORBIT_TRAPS
@@ -963,6 +962,8 @@ vec3 getColour(float real, float imag) {
                     colour_val = 0.0;
                 #endif
             #endif
+
+            colour_val = max(colour_val, 0.0);
 
             #ifdef MONOTONIC_EASE_OUT
                 colour_val = 1.0 - colour_val;
@@ -1055,12 +1056,71 @@ vec3 getColour(float real, float imag) {
                 colour_val = abs(angle) / PI;
 
             #elif RADIAL_DECOMPOSITION == 1
-                colour_val = angle > 0.0 ? 0.0 : 1.0;
+
+                float angle_norm = 1.0 - abs(angle) / PI;
+
+                #if EXTERIOR_COLOURING == 0
+
+                    float closest_dist = MAX;
+                    float closest_pos = 0.0;
+
+                    for (int i = 0; i < EXTERIOR_COLOURING_COLOUR_COUNT; i++) {
+                        
+                        float dist = abs(exterior_colouring_positions[i] - angle_norm);
+                        
+                        if (dist < closest_dist) {
+                            closest_dist = dist;
+                            closest_pos = exterior_colouring_positions[i];
+                        }
+                    }
+
+                    colour_val = closest_pos;
+
+                #elif EXTERIOR_COLOURING == 1
+                    colour_val = angle_norm;
+                #endif
             #endif
         #endif
 
         #if EXTERIOR_COLOURING == 0
-            return mix(exterior_colour2, exterior_colour1, colour_val);
+
+            int lower_colour_idx = -1;
+            float lower_colour_pos = -1.0;
+
+            int upper_colour_idx = -1;
+            float upper_colour_pos = 2.0;
+
+            for (int i = 0; i < EXTERIOR_COLOURING_COLOUR_COUNT; i++) {
+                if (exterior_colouring_positions[i] <= colour_val && exterior_colouring_positions[i] > lower_colour_pos) {
+                    lower_colour_idx = i;
+                    lower_colour_pos = exterior_colouring_positions[i];
+                }
+                else if (exterior_colouring_positions[i] >= colour_val && exterior_colouring_positions[i] < upper_colour_pos) {
+                    upper_colour_idx = i;
+                    upper_colour_pos = exterior_colouring_positions[i];
+                }
+            }
+
+            vec3 lower_colour;
+            vec3 upper_colour;
+            
+            if (lower_colour_idx == -1) {
+                lower_colour = exterior_colouring_colours[upper_colour_idx];
+                lower_colour_pos = upper_colour_pos;
+            }
+            else {
+                lower_colour = exterior_colouring_colours[lower_colour_idx];
+            }
+
+            if (upper_colour_idx == -1) {
+                upper_colour = lower_colour;
+                upper_colour_pos = lower_colour_pos;
+            }
+            else {
+                upper_colour = exterior_colouring_colours[upper_colour_idx];
+            }
+
+            return mixColour(lower_colour, upper_colour, (colour_val - lower_colour_pos) / (upper_colour_pos - lower_colour_pos + 0.0001));
 
         #elif EXTERIOR_COLOURING == 1
             return hsv2rgb(vec3(colour_val, 1.0, 1.0));

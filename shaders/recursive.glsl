@@ -3,9 +3,6 @@ uniform int iterations;
 
 const int TRUE_ITER_CAP = 20;
 
-const vec3 WHITE = vec3(1.0, 1.0, 1.0);
-const vec3 BLACK = vec3(0.0, 0.0, 0.0);
-
 const float ONE_THIRD = 0.33333333333;
 const float TWO_THIRDS = 0.66666666667;
 

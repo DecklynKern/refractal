@@ -18,6 +18,8 @@ var centre_x = new ParamFloat(0, "centre_x");
 var centre_y = new ParamFloat(0, "centre_y");
 var canvas_size = new ParamInt(1000, "canvas_size");
 
+var gradients = [];
+
 var transformation = 0;
 var invert_handler;
 var moebius_a_handler;
@@ -36,7 +38,7 @@ var transform_param7 = new ParamFloat(0.0, "transform_param7");
 var transform_param8 = new ParamFloat(0.0, "transform_param8");
 
 var samples = 1;
-var multisampling_algorithm = 1;
+var blending_algorithm = 0;
 
 var busy = false;
 
@@ -78,20 +80,27 @@ function main() {
 
     document.getElementById("samples").onchange = updateSamples;
     document.getElementById("canvas_size").onchange = updateCanvasSize;
-    document.getElementById("multisampling_algorithm").onchange = updateMultisamplingAlgorithm;
+    document.getElementById("blending_algorithm").onchange = updateBlendingAlgorithm;
 
     document.getElementById("path_canvas").onclick = onFractalClick;
     
-    document.querySelectorAll('[anim_param="1"]').forEach(
-        function(anim_param) {
-        anim_param.onchange = function(event) {
-                animation_param1 = event.target.value;
-            }
-        }
-    );
+    document.querySelectorAll('[anim_param="1"]').forEach(anim_param => {
+        anim_param.onchange = event => animation_param1 = event.target.value
+    });
 
     path_context = document.getElementById("path_canvas").getContext("2d");
     document.getElementById("path_canvas").onmouseleave = clearPath;
+
+    var idx = 0;
+    document.querySelectorAll(".gradient").forEach(canvas => {
+
+        const init_min_colour = canvas.dataset.hasOwnProperty("init_min_colour") ? canvas.dataset.init_min_colour : "#FF0000";
+        const init_max_colour = canvas.dataset.hasOwnProperty("init_max_colour") ? canvas.dataset.init_max_colour : "#0000FF";
+
+        gradients.push(new GradientHandler(canvas, init_min_colour, init_max_colour));
+        canvas.gradient_idx = idx++;
+
+    });
 
     ESCAPE_TIME.setupGUI();
     LYAPUNOV.setupGUI();
@@ -131,7 +140,7 @@ function setupShader() {
     const global_settings = `
     #define TRANSFORMATION ${transformation}
     #define SAMPLES ${samples}
-    #define MULTISAMPLING_ALGORITHM ${multisampling_algorithm}`;
+    #define BLENDING_ALGORITHM ${blending_algorithm}`;
 
     FRAGMENT_SHADER = program.getShader().replace("//%", global_settings);
     initShaders(gl, VERTEX_SHADER, FRAGMENT_SHADER);
@@ -163,6 +172,7 @@ function initWebGL() {
     
     const canvas = document.getElementById("fractal_canvas");
     gl = canvas.getContext("webgl2");
+    gl.disable(gl.DEPTH_TEST);
 
     const vertices = new Float32Array([
         -1.0,  1.0,
@@ -300,8 +310,8 @@ function clearPath() {
     path_context.clearRect(0, 0, canvas_size.value, canvas_size.value);
 }
 
-function updateMultisamplingAlgorithm(event) {
-    multisampling_algorithm = event.target.value;
+function updateBlendingAlgorithm(event) {
+    blending_algorithm = event.target.value;
     setupShader();
     redraw();
 }
