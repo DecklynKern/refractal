@@ -82,7 +82,7 @@ class EscapeTime extends Program {
     exterior_colouring_param1 = new ParamFloat(0, "exterior_colouring_param1");
     exterior_colouring_param2 = new ParamFloat(0, "exterior_colouring_param2");
 
-    exterior_colouring_colours = new ParamVec3List([[0, 0, 0], [0, 0, 1]], "exterior_colouring_colours");
+    exterior_colouring_colours = new ParamVec3List([[1, 1, 1], [0, 0, 1]], "exterior_colouring_colours");
     exterior_colouring_positions = new ParamFloatList([0, 1], "exterior_colouring_positions");
 
     interior_colouring = 0;

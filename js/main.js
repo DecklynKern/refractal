@@ -96,7 +96,7 @@ function main() {
 
         const init_min_colour = canvas.dataset.hasOwnProperty("init_min_colour") ? canvas.dataset.init_min_colour : "#FF0000";
         const init_max_colour = canvas.dataset.hasOwnProperty("init_max_colour") ? canvas.dataset.init_max_colour : "#0000FF";
-
+        
         gradients.push(new GradientHandler(canvas, init_min_colour, init_max_colour));
         canvas.gradient_idx = idx++;
 
@@ -171,7 +171,7 @@ function setupShader() {
 function initWebGL() {
     
     const canvas = document.getElementById("fractal_canvas");
-    gl = canvas.getContext("webgl2");
+    gl = canvas.getContext("webgl2", {preserveDrawingBuffer: true});
     gl.disable(gl.DEPTH_TEST);
 
     const vertices = new Float32Array([
