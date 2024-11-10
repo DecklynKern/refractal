@@ -208,7 +208,8 @@ class Pendulum extends Program {
 
     drawMagnets() {
 
-        this.magnet_canvas_context.clearRect(0, 0, 200, 200);
+        this.magnet_canvas_context.fillStyle = "white";
+        this.magnet_canvas_context.fillRect(0, 0, 200, 200);
 
         this.magnet_canvas_context.beginPath();
         this.magnet_canvas_context.strokeStyle = "black";

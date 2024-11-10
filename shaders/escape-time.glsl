@@ -817,7 +817,7 @@ vec3 getColour(float real, float imag) {
 
             #else
                 // try mandelbrot der, prob won't work
-                der = 2.0 * prod(z_prev, der) + ONE;
+                der = 2.0 * prod(z_prev, der) + ONE;    
             #endif
         #endif
         
