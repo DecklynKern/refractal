@@ -215,7 +215,8 @@ class ComplexPickerHandler {
     
     redraw(x, y) {
     
-        this.canvas_context.clearRect(0, 0, 200, 200);
+        this.canvas_context.fillStyle = "white";
+        this.canvas_context.fillRect(0, 0, 200, 200);
     
         this.canvas_context.beginPath();
         this.canvas_context.moveTo(0, 100);
@@ -329,7 +330,7 @@ class GradientHandler {
 
             this.selected_colour = clicked_colour;
 
-            if (event.offsetY > GRADIENT_CIRCLE_Y + GRADIENT_CIRCLE_RADIUS) {
+            if (event.offsetY < GRADIENT_CIRCLE_Y + GRADIENT_CIRCLE_RADIUS) {
 
                 const colour_picker = document.getElementById("colour-picker");
 

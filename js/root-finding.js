@@ -179,7 +179,8 @@ class RootFinding extends Program {
 
     drawRoots() {
 
-        this.root_canvas_context.clearRect(0, 0, 200, 200);
+        this.root_canvas_context.fillStyle = "white";
+        this.root_canvas_context.fillRect(0, 0, 200, 200);
 
         this.root_canvas_context.strokeStyle = "black";
         this.root_canvas_context.beginPath();
