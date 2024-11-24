@@ -67,7 +67,7 @@ class RootFinding extends Program {
         document.getElementById("secant_start").onchange = paramSetWithRecompile(this, "secant_start");
         document.getElementById("rtf_fractal_type").onchange = this.updateFractalType;
         
-        document.getElementById("rtf_iterations").onchange = paramSet(this.max_iterations);
+        document.getElementById("rtf_iterations").onchange = this.updateMaxIterations;
         document.getElementById("rtf_threshold").onchange = paramSet(this.threshold);
         
         document.getElementById("root_selector").onmousedown = this.clickRoot;
@@ -279,6 +279,15 @@ class RootFinding extends Program {
         }
 
         ROOT_FINDING.drawRoots();
+        redraw();
+
+    }
+
+    updateMaxIterations(event) {
+
+        ROOT_FINDING.max_iterations = event.target.value;
+
+        setupShader();
         redraw();
 
     }

@@ -504,6 +504,24 @@
               <option value=5>Householder-3</option>
               <option value=4>Secant</option>
               <option value=3>Steffensen</option>
+              <option value=6>Basto-Semiao-Calheiros</option>
+              <option value=7>Whittaker I</option>
+              <option value=8>Whittaker II</option>
+              <option value=9>Euler-Chebyshev</option>
+              <option value=10>Ostrowski</option>
+              <option value=11>King</option>
+              <option value=12>Chun II</option>
+              <option value=13>Chun III</option>
+              <option value=14>Feng</option>
+              <option value=15>Contra-Harmonic Newton</option>
+              <option value=17>Kung-Traub</option>
+              <option value=16>Fang-Ni-Chen</option>
+              <option value=18>Rafiq</option>
+              <option value=19>Chun-Kim I</option>
+              <option value=20>Chun-Kim II</option>
+              <option value=21>Chun-Kim III</option>
+              <option value=22>Sharma</option>
+              <option value=23>Chun-Lee-Neta</option>
             </select>
             <div id="secant_div" style="display: none">
               <br>
@@ -564,7 +582,7 @@
             <input id="rtf_iterations" type=number value=40 min=0>
             <br>
             Bailout Threshold:
-            <input id="rtf_threshold" type=number value=0.01 min=0 step=0.01 style="width: 70px">
+            <input id="rtf_threshold" type=number value=0.000001 min=0 step=0.000001 style="width: 70px">
           </details>
           <details open=true>
             <summary>
@@ -785,9 +803,6 @@
           </select>
           <hr>
           <div id="display_text" style="font-family: monospace">
-            z = 0 + 0i
-            <br>
-            zoom = 0.5
           </div>
           <button onclick="resetView()">
             Reset View

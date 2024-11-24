@@ -40,12 +40,30 @@ const Complex SQRT_2 = Complex(1.41421356, 0.0);
 const vec3 BLACK = vec3(0.0, 0.0, 0.0);
 const vec3 WHITE = vec3(1.0, 1.0, 1.0);
 
+#define add(a, b) ((a) + (b))
+#define add3(a, b, c) add(a, add(b, c))
+#define sub(a, b) ((a) - (b))
+
 Complex reciprocal(Complex z) {
     return Complex(z.real, -z.imag) * (1.0 / dot(z, z));
 }
 
 Complex square(Complex z) {
-    return Complex(z.real * z.real - z.imag * z.imag, 2.0 * z.real * z.imag);
+    return Complex(
+        z.real * z.real - z.imag * z.imag,
+        2.0 * z.real * z.imag
+    );
+}
+
+Complex cube(Complex z) {
+
+    float z_real_sq = z.real * z.real;
+    float z_imag_sq = z.imag * z.imag;
+
+    return z * Complex(
+        z_real_sq - 3.0 * z_imag_sq,
+        3.0 * z_real_sq - z_imag_sq
+    );
 }
 
 Complex prod(Complex x, Complex y) {
