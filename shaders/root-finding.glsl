@@ -611,6 +611,13 @@ vec3 getColour(float real, float imag) {
         float thresh = 2.0 * (threshold + 0.000000000000001);
         return vec3((thresh * round(params.z.xy / thresh)), 1.0);
 
+    #elif COLOURING_TYPE == 6
+
+        float hue = (atan(params.z.y, params.z.x) + PI) / TAU;
+        float luminosity = sqrt(length(params.z) / 2.0);
+
+        return hsv2rgb(vec3(hue, 1.0, luminosity));
+
     #else
 
         float root_dist_1 = root_dist_sq(params.z, root1);

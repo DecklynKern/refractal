@@ -340,9 +340,13 @@ class GradientHandler {
                 colour_picker.focus();
                 colour_picker.click();
                 colour_picker.onchange = function(event) {
+                
                     t.colours[t.selected_colour][1] = event.target.value;
                     t.redraw();
                     t.onColourChange(clicked_colour);
+
+                    mouse_down = false;
+                
                 }
             }
 
