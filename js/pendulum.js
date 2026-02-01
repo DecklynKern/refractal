@@ -1,5 +1,7 @@
 class Pendulum extends Program {
 
+    name = "pendulum";
+    display_name = "Pendulum";
     shader = "shaders/pendulum.glsl";
     options_panel = "pendulum_options";
 
@@ -38,7 +40,7 @@ class Pendulum extends Program {
         #define MAGNET_COUNT ${this.magnet_strengths.length}
         #define COLOURING_STYLE ${this.colouring_style}`;
 
-        return this.baseShader.replace("//%", def);
+        return this.base_shader.replace("//%", def);
 
     }
     

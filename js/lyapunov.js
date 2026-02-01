@@ -26,8 +26,13 @@ LYAPUNOV_INITIAL_VALUES = [
 
 class Lyapunov extends Program {
 
+    name = "lyapunov";
+    display_name = "Lyapunov";
     shader = "shaders/lyapunov.glsl";
     options_panel = "lyapunov_options";
+
+    default_centre_x = 2;
+    default_centre_y = -2;
 
     fractal_type = 0;
 
@@ -54,7 +59,7 @@ class Lyapunov extends Program {
 
     getShader() {
         
-        var shader = (' ' + this.baseShader).slice(1);
+        var shader = (' ' + this.base_shader).slice(1);
         var def = `
         //%
         #define FLIP_Y

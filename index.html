@@ -12,6 +12,7 @@
     <script src="js/root-finding.js"></script>
     <script src="js/pendulum.js"></script>
     <script src="js/recursive.js"></script>
+    <script src="js/root-possibilities.js"></script>
     <script src="js/main.js"></script>
   </head>
   <body onload="main()">
@@ -23,13 +24,7 @@
           <summary>
             Program
           </summary>
-          <select id="program">
-            <option value="escape-time">Escape Time</option>
-            <option value="lyapunov">Lyapunov</option>
-            <option value="root-finding">Root Finding</option>
-            <option value="recursive">Recursive</option>
-            <option value="pendulum">Pendulum</option>
-          </select>
+          <select id="program"></select>
         </details>
         <div id="escape_time_options">
           <details open=true>
@@ -394,7 +389,7 @@
             </div>
           </details>
         </div>
-        <div id="lyapunov_options" style="display: none">
+        <div id="lyapunov_options">
           <details open=true>
             <summary>
               Chaotic map options
@@ -484,7 +479,7 @@
             </div>
           </details>
         </div>
-        <div id="root_finding_options" style="display: none">
+        <div id="root_finding_options">
           <details open=true>
             <summary>
               Function options
@@ -633,7 +628,7 @@
             </div>
           </details>
         </div>
-        <div id="pendulum_options" style="display: none">
+        <div id="pendulum_options">
           <details open=true>
             <summary>
               Iteration parameters
@@ -678,7 +673,7 @@
             <input id="pend_base_colour" type=color value=#000000>
           </details>
         </div>
-        <div id="recursive_options" style="display: none">
+        <div id="recursive_options">
           <details open=true>
             <summary>
               Fractal options
@@ -700,6 +695,15 @@
             Iterations:
             <input id="rc_iterations" type=number value=8 min=0 max=20>
           </details>
+        </div>
+        <div id="root_possibilities_options">
+            <details open=true>
+              <summary>
+                Fractal options
+              </summary>
+              Degree:
+              <input id="rp_degree" type=number value=8 min=2 max=20>
+            </details>
         </div>
       </div>
       <div class="sidebar">

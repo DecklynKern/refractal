@@ -143,11 +143,15 @@ class ParamVec3List extends Param {
 
 class Program {
     
-    baseShader = null;
+    base_shader = null;
     params = [];
 
+    default_centre_x = 0;
+    default_centre_y = 0;
+    default_magnitude = 2;
+
     getShader() {
-        return this.baseShader;
+        return this.base_shader;
     }
     
     drawPath() {}

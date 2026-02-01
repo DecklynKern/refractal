@@ -39,17 +39,19 @@ const ESCAPE_TIME_FUNCTIONS = [
 
 const ESCAPE_TIME_ANIMATIONS = [
     function(ms) {
-        ESCAPE_TIME.julia_c.real = animation_param1 * Math.sin(ms / 1000);
-        ESCAPE_TIME.julia_c.imag = animation_param1 * Math.cos(ms / 1000);
+        self.julia_c.real = animation_param1 * Math.sin(ms / 1000);
+        self.julia_c.imag = animation_param1 * Math.cos(ms / 1000);
     },
     function(ms) {
-        ESCAPE_TIME.julia_c.real = animation_param1 * Math.sin(ms / 1000) * Math.sin(ms / 2500);
-        ESCAPE_TIME.julia_c.imag = animation_param1 * Math.cos(ms / 1000) * Math.sin(ms / 2500);
+        self.julia_c.real = animation_param1 * Math.sin(ms / 1000) * Math.sin(ms / 2500);
+        self.julia_c.imag = animation_param1 * Math.cos(ms / 1000) * Math.sin(ms / 2500);
     },
 ];
 
 class EscapeTime extends Program {
 
+    name = "escape-time";
+    display_name = "Escape Time";
     shader = "shaders/escape-time.glsl";
     options_panel = "escape_time_options";
 
@@ -254,7 +256,7 @@ class EscapeTime extends Program {
 
         }
         
-        return this.baseShader.replace("//%", def);
+        return this.base_shader.replace("//%", def);
 
     }
 
@@ -262,19 +264,19 @@ class EscapeTime extends Program {
         
         document.querySelectorAll('[esc_param="1"]').forEach(
             function(fractal_param) {
-                fractal_param.onchange = paramSet(ESCAPE_TIME.fractal_param1);
+                fractal_param.onchange = paramSet(self.fractal_param1);
             }
         );
         
         document.querySelectorAll('[esc_param="2"]').forEach(
             function(fractal_param) {
-                fractal_param.onchange = paramSet(ESCAPE_TIME.fractal_param2);
+                fractal_param.onchange = paramSet(self.fractal_param2);
             }
         );
         
         document.querySelectorAll('[esc_param="3"]').forEach(
             function(fractal_param) {
-                fractal_param.onchange = paramSet(ESCAPE_TIME.fractal_param3);
+                fractal_param.onchange = paramSet(self.fractal_param3);
             }
         );
 
@@ -328,8 +330,8 @@ class EscapeTime extends Program {
         
         exterior_gradient_handler.onColourNumChange = function() {
 
-            ESCAPE_TIME.exterior_colouring_positions.value = exterior_gradient_handler.colours.map(colour => colour[0]);
-            ESCAPE_TIME.exterior_colouring_colours.value = exterior_gradient_handler.colours.map(colour => hexToRGB(colour[1]));
+            self.exterior_colouring_positions.value = exterior_gradient_handler.colours.map(colour => colour[0]);
+            self.exterior_colouring_colours.value = exterior_gradient_handler.colours.map(colour => hexToRGB(colour[1]));
 
             setupShader();
             redraw();
@@ -338,8 +340,8 @@ class EscapeTime extends Program {
         
         exterior_gradient_handler.onColourChange = function(idx) {
 
-            ESCAPE_TIME.exterior_colouring_positions.value[idx] = exterior_gradient_handler.colours[idx][0];
-            ESCAPE_TIME.exterior_colouring_colours.value[idx] = hexToRGB(exterior_gradient_handler.colours[idx][1]);
+            self.exterior_colouring_positions.value[idx] = exterior_gradient_handler.colours[idx][0];
+            self.exterior_colouring_colours.value[idx] = hexToRGB(exterior_gradient_handler.colours[idx][1]);
 
             redraw();
         
@@ -362,7 +364,7 @@ class EscapeTime extends Program {
 
     updateFractal(event) {
 
-        ESCAPE_TIME.fractal = +event.target.value;
+        self.fractal = +event.target.value;
     
         var scaling_style = document.getElementById("scaling_div").style;
         var exponent_style = document.getElementById("exponent_div").style;
@@ -391,60 +393,60 @@ class EscapeTime extends Program {
         sauron_style.display = "none";
         foam_style.display = "none";
 
-        function_text.innerHTML = ESCAPE_TIME_FUNCTIONS[ESCAPE_TIME.fractal];
+        function_text.innerHTML = ESCAPE_TIME_FUNCTIONS[self.fractal];
 
         document.getElementById("julia_div").style.display = show(
-            ![19, 34, 42, 43].includes(ESCAPE_TIME.fractal)
+            ![19, 34, 42, 43].includes(self.fractal)
         );
 
-        if ([5, 40, 52].includes(ESCAPE_TIME.fractal)) {
+        if ([5, 40, 52].includes(self.fractal)) {
             exponent_style.display = "block";
-            ESCAPE_TIME.fractal_param1.value = document.getElementById("exponent").value;
+            self.fractal_param1.value = document.getElementById("exponent").value;
         }
-        else if ([23, 53, 54].includes(ESCAPE_TIME.fractal)) {
+        else if ([23, 53, 54].includes(self.fractal)) {
             cmultibrot_style.display = "block";
-            ESCAPE_TIME.cmultibrot_p_handler.loadValues();
+            self.cmultibrot_p_handler.loadValues();
         }
 
-        if (ESCAPE_TIME.fractal == 4) {
+        if (self.fractal == 4) {
             scaling_style.display = "block";
-            ESCAPE_TIME.fractal_param1.value = document.getElementById("scaling").value;
+            self.fractal_param1.value = document.getElementById("scaling").value;
         }
-        else if (ESCAPE_TIME.fractal == 15) {
+        else if (self.fractal == 15) {
             rational_style.display = "block";
-            ESCAPE_TIME.fractal_param1.value = document.getElementById("rational_p").value;
-            ESCAPE_TIME.fractal_param2.value = document.getElementById("rational_q").value;
-            ESCAPE_TIME.fractal_param3.value = document.getElementById("rational_lambda").value;
+            self.fractal_param1.value = document.getElementById("rational_p").value;
+            self.fractal_param2.value = document.getElementById("rational_q").value;
+            self.fractal_param3.value = document.getElementById("rational_lambda").value;
         }
-        else if (ESCAPE_TIME.fractal == 16) {
+        else if (self.fractal == 16) {
             phoenix_style.display = "block";
-            ESCAPE_TIME.phoenix_p_handler.loadValues();
+            self.phoenix_p_handler.loadValues();
         }
-        else if (ESCAPE_TIME.fractal == 19) {
+        else if (self.fractal == 19) {
             dragon_style.display = "block";
         }
-        else if (ESCAPE_TIME.fractal == 20) {
+        else if (self.fractal == 20) {
             gangopadhyay_style.display = "block";
         }
-        else if (ESCAPE_TIME.fractal == 30) {
+        else if (self.fractal == 30) {
             mandelbruh_style.display = "block";
-            ESCAPE_TIME.fractal_param1.value = document.getElementById("mandelbruh_a").value;
+            self.fractal_param1.value = document.getElementById("mandelbruh_a").value;
         }
-        else if (ESCAPE_TIME.fractal == 31) {
+        else if (self.fractal == 31) {
             hyperbolic_sine_style.display = "block";
-            ESCAPE_TIME.fractal_param1.value = document.getElementById("hyperbolic_sine_p").value;
+            self.fractal_param1.value = document.getElementById("hyperbolic_sine_p").value;
         }
-        else if (ESCAPE_TIME.fractal == 32) {
+        else if (self.fractal == 32) {
             zubieta_style.display = "block";
-            ESCAPE_TIME.zubieta_a_handler.loadValues();
+            self.zubieta_a_handler.loadValues();
         }
-        else if (ESCAPE_TIME.fractal == 38) {
+        else if (self.fractal == 38) {
             sauron_style.display = "block";
-            ESCAPE_TIME.sauron_a_handler.loadValues();
+            self.sauron_a_handler.loadValues();
         }
-        else if (ESCAPE_TIME.fractal == 41) {
+        else if (self.fractal == 41) {
             foam_style.display = "block";
-            ESCAPE_TIME.foam_q_handler.loadValues();
+            self.foam_q_handler.loadValues();
         }
         
         setupShader();
@@ -454,7 +456,7 @@ class EscapeTime extends Program {
     
     updateEscapeAlgorithm(event) {
         
-        ESCAPE_TIME.escape_algorithm = event.target.value;
+        self.escape_algorithm = event.target.value;
         
         var mag_style = document.getElementById("esc_mag_div").style;
         var der_style = document.getElementById("esc_der_div").style;
@@ -462,13 +464,13 @@ class EscapeTime extends Program {
         mag_style.display = "none";
         der_style.display = "none";
         
-        if (ESCAPE_TIME.escape_algorithm == 0) {
+        if (self.escape_algorithm == 0) {
             mag_style.display = "block";
-            ESCAPE_TIME.escape_param.value = Math.pow(document.getElementById("escape_radius").value, 2.0);
+            self.escape_param.value = Math.pow(document.getElementById("escape_radius").value, 2.0);
         }
-        else if (ESCAPE_TIME.escape_algorithm == 1) {
+        else if (self.escape_algorithm == 1) {
             der_style.display = "block";
-            ESCAPE_TIME.escape_param.value = Math.pow(document.getElementById("escape_derivative").value, 2.0);
+            self.escape_param.value = Math.pow(document.getElementById("escape_derivative").value, 2.0);
         }
         
         setupShader();
@@ -477,7 +479,7 @@ class EscapeTime extends Program {
     }
     
     updateEscapeParamSquared(event) {
-        ESCAPE_TIME.escape_param.value = event.target.value * event.target.value;
+        self.escape_param.value = event.target.value * event.target.value;
         redraw();
     }
 
@@ -492,7 +494,7 @@ class EscapeTime extends Program {
         new_orbit_trap.innerHTML = `
         <hr>
         <div class="grid-entry">
-            <select onchange="ESCAPE_TIME.updateOrbitTrap(event)">
+            <select onchange="self.updateOrbitTrap(event)">
                 <option value=0>Centre Point</option>
                 <option value=6>Centre Point (Taxicab distance)</option>
                 <option value=1>Circle</option>
@@ -502,7 +504,7 @@ class EscapeTime extends Program {
                 <option value=5>Gaussian Integers (Taxicab distance)</option>
                 <option value=7>Line</option>
             </select>
-            <button onclick="ESCAPE_TIME.deleteOrbitTrap(event)">
+            <button onclick="self.deleteOrbitTrap(event)">
                 X
             </button>
         </div>
@@ -559,16 +561,16 @@ class EscapeTime extends Program {
 
     synchExteriorColourSettings() {
 
-        document.getElementById("exterior_gradient").style.display = show(ESCAPE_TIME.exterior_colouring == 0);
+        document.getElementById("exterior_gradient").style.display = show(self.exterior_colouring == 0);
         
-        if (ESCAPE_TIME.exterior_colouring == 0) {
+        if (self.exterior_colouring == 0) {
             // load colours
         }
     }
 
     updateExteriorColouringStyle(event) {
 
-        ESCAPE_TIME.exterior_colouring_style = event.target.value;
+        self.exterior_colouring_style = event.target.value;
 
         const styles = [
             document.getElementById("monotonic_rendering_div").style,
@@ -577,13 +579,13 @@ class EscapeTime extends Program {
         ];
 
         styles.forEach(style => style.display = "none");
-        styles[ESCAPE_TIME.exterior_colouring_style].display = "block";
+        styles[self.exterior_colouring_style].display = "block";
 
-        if (ESCAPE_TIME.exterior_colouring_style == 1) {
-            ESCAPE_TIME.exterior_colouring_param1.value = document.getElementById("esc_cycle_period").value;
+        if (self.exterior_colouring_style == 1) {
+            self.exterior_colouring_param1.value = document.getElementById("esc_cycle_period").value;
         }
 
-        ESCAPE_TIME.synchExteriorColourSettings();
+        self.synchExteriorColourSettings();
         setupShader();
         redraw();
 
@@ -591,7 +593,7 @@ class EscapeTime extends Program {
 
     updateMonotonicFunction(event) {
 
-        ESCAPE_TIME.monotonic_function = event.target.value;
+        self.monotonic_function = event.target.value;
 
         var light_style = document.getElementById("light_selector_div").style;
         var stripe_style = document.getElementById("stripe_average_div").style;
@@ -599,13 +601,13 @@ class EscapeTime extends Program {
         light_style.display = "none";
         stripe_style.display = "none";
 
-        if (ESCAPE_TIME.monotonic_function == 2) {
+        if (self.monotonic_function == 2) {
             light_style.display = "block";
-            ESCAPE_TIME.light_handler.loadValues();
+            self.light_handler.loadValues();
         }
-        else if (ESCAPE_TIME.monotonic_function == 3) {
+        else if (self.monotonic_function == 3) {
             stripe_style.display = "block";
-            ESCAPE_TIME.exterior_colouring_param1.value = document.getElementById("stripe_density").value;
+            self.exterior_colouring_param1.value = document.getElementById("stripe_density").value;
         }
 
         setupShader();
@@ -615,9 +617,9 @@ class EscapeTime extends Program {
 
     updateExteriorColouring(event) {
     
-        ESCAPE_TIME.exterior_colouring = event.target.value;
+        self.exterior_colouring = event.target.value;
 
-        ESCAPE_TIME.synchExteriorColourSettings();
+        self.synchExteriorColourSettings();
         setupShader();
         redraw();
     
@@ -625,7 +627,7 @@ class EscapeTime extends Program {
 
     updateInteriorColouring(event) {
 
-        ESCAPE_TIME.interior_colouring = event.target.value;
+        self.interior_colouring = event.target.value;
 
         var solid_style = document.getElementById("interior_solid_div").style;
         var dist_style = document.getElementById("interior_dist_div").style;
@@ -637,26 +639,26 @@ class EscapeTime extends Program {
         stripe_style.display = "none";
         period_style.display = "none";
 
-        if (ESCAPE_TIME.interior_colouring == 6 || ESCAPE_TIME.interior_colouring == 7) {
+        if (self.interior_colouring == 6 || self.interior_colouring == 7) {
         }
-        else if (ESCAPE_TIME.interior_colouring == 0) {
+        else if (self.interior_colouring == 0) {
             solid_style.display = "block";
-            ESCAPE_TIME.interior_colour1.value = hexToRGB(document.getElementById("interior_solid_colour").value);
+            self.interior_colour1.value = hexToRGB(document.getElementById("interior_solid_colour").value);
         
         }
         else {
             dist_style.display = "block";
-            ESCAPE_TIME.interior_colour1.value = hexToRGB(document.getElementById("interior_close_colour").value);
-            ESCAPE_TIME.interior_colour2.value = hexToRGB(document.getElementById("interior_far_colour").value);
+            self.interior_colour1.value = hexToRGB(document.getElementById("interior_close_colour").value);
+            self.interior_colour2.value = hexToRGB(document.getElementById("interior_far_colour").value);
         }
 		
-        if (ESCAPE_TIME.interior_colouring == 4) {
-            ESCAPE_TIME.interior_colouring_param1.value = document.getElementById("interior_stripe_density").value;
+        if (self.interior_colouring == 4) {
+            self.interior_colouring_param1.value = document.getElementById("interior_stripe_density").value;
             stripe_style.display = "block";
         }
-        else if (ESCAPE_TIME.interior_colouring == 6) {
-            ESCAPE_TIME.interior_colouring_param1.value = document.getElementById("interior_period_length").value;
-            ESCAPE_TIME.interior_colouring_param2.value = document.getElementById("interior_period_threshold").value;
+        else if (self.interior_colouring == 6) {
+            self.interior_colouring_param1.value = document.getElementById("interior_period_length").value;
+            self.interior_colouring_param2.value = document.getElementById("interior_period_threshold").value;
             period_style.display = "block";
         }
 

@@ -9,7 +9,17 @@ const LYAPUNOV = new Lyapunov();
 const ROOT_FINDING = new RootFinding();
 const PENDULUM = new Pendulum();
 const RECURSIVE = new Recursive();
-var program = ESCAPE_TIME;
+const ROOT_POSSIBILITIES = new RootPossibilities();
+
+const PROGRAMS = [
+    ESCAPE_TIME,
+    LYAPUNOV,
+    ROOT_FINDING,
+    PENDULUM,
+    RECURSIVE,
+    ROOT_POSSIBILITIES,
+];
+var program = PROGRAMS[0];
 
 var mouse_down = false;
 
@@ -102,11 +112,17 @@ function main() {
 
     });
 
-    ESCAPE_TIME.setupGUI();
-    LYAPUNOV.setupGUI();
-    ROOT_FINDING.setupGUI();
-    PENDULUM.setupGUI();
-    RECURSIVE.setupGUI();
+    for (let setup_program of PROGRAMS) {
+
+        var option = document.createElement("option");
+        option.value = setup_program.name;
+        option.innerText = setup_program.display_name;
+        document.getElementById("program").appendChild(option);
+
+        document.getElementById(setup_program.options_panel).style.display = show(setup_program == program);
+
+        setup_program.setupGUI();
+    }
 
     initWebGL();
     loadProgram(ESCAPE_TIME);
@@ -130,7 +146,7 @@ function loadProgram(prgrm) {
 }
 
 function receiveShader() {
-    program.baseShader = FRAGMENT_MAIN + this.responseText;
+    program.base_shader = FRAGMENT_MAIN + this.responseText;
     setupShader();
     resetView();
 }
@@ -226,28 +242,10 @@ function tryRedraw(force) {
 }
 
 function updateProgram() {
-
-    switch (document.getElementById("program").value) {
-
-        case "escape-time":
-            loadProgram(ESCAPE_TIME);
-            break;
-
-        case "lyapunov":
-            loadProgram(LYAPUNOV);
-            break;
-
-        case "root-finding":
-            loadProgram(ROOT_FINDING);
-            break;
-
-        case "pendulum":
-            loadProgram(PENDULUM);
-            break;
-
-        case "recursive":
-            loadProgram(RECURSIVE);
-
+    for (let program of PROGRAMS) {
+        if (document.getElementById("program").value == program.name) {
+            loadProgram(program);
+        }
     }
 }
 
@@ -354,21 +352,9 @@ async function playAnimation() {
 
 function resetView() {
 
-    magnitude.value = 2.0;
-
-    if (program == LYAPUNOV) {
-        centre_x.value = 2.0;
-        centre_y.value = -2.0;
-    }
-    else if (program == RECURSIVE) {
-        centre_x.value = 0.5;
-        centre_y.value = -0.5;
-        magnitude.value = 0.5;
-    }
-    else {
-        centre_x.value = 0.0;
-        centre_y.value = 0.0;
-    }
+    centre_x.value = program.default_centre_x;
+    centre_y.value = program.default_centre_y;
+    magnitude.value = program.default_magnitude;
 
     updateDisplayText();
     redraw();

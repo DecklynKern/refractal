@@ -1,5 +1,7 @@
 class RootFinding extends Program {
 
+    name = "root-finding";
+    display_name = "Root Finding";
     shader = "shaders/root-finding.glsl";
     options_panel = "root_finding_options";
 
@@ -56,7 +58,7 @@ class RootFinding extends Program {
             def += `\n#define START_POINT ${this.secant_start}`;
         }
 
-        return this.baseShader.replace("//%", def);
+        return this.base_shader.replace("//%", def);
 
     }
 
