@@ -238,6 +238,8 @@ class Pendulum extends Program {
 
     drawPath(event) {
 
+        console.log("abc");
+
         if (program != PENDULUM) {
             return;
         }
